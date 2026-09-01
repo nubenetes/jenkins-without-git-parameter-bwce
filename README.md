@@ -240,7 +240,9 @@ The Datadog Java Tracer (`dd-java-agent.jar`) is injected into the BWCE containe
 * JVM garbage collection and heap utilization.
 
 ### 3. Progressive Delivery with Argo Rollouts & Datadog Metrics SLA
-During production deployments, **Argo Rollouts** executes a canary rollout (20% $ightarrow$ 50% $ightarrow$ 100%) and queries Datadog metrics via an `AnalysisTemplate`. If the HTTP 5xx error rate exceeds 0.5%, the rollout automatically aborts and rolls back to stable.
+During production deployments, **Argo Rollouts** executes a canary rollout (20% $
+ightarrow$ 50% $
+ightarrow$ 100%) and queries Datadog metrics via an `AnalysisTemplate`. If the HTTP 5xx error rate exceeds 0.5%, the rollout automatically aborts and rolls back to stable.
 
 ---
 
@@ -254,18 +256,18 @@ During production deployments, **Argo Rollouts** executes a canary rollout (20% 
 
 ```mermaid
 flowchart TB
-    subgraph Pattern1["Pattern 1: Jenkins Parameter Proxy (jenkins-git-parameter-bwce)"]
+    subgraph Pattern1["Pattern 1: Jenkins Parameter Proxy (Legacy Push)"]
         direction TB
         Dev1["👩‍💻 Developer"] -->|"1. Opens Jenkins UI"| JenkinsUI["📋 Jenkins Job Form<br/>(gitParameter Dropdowns)"]
         JenkinsUI -->|"2. Queries Remote Refs"| SCMQuery["🔍 Jenkins Master SCM Query<br/>(origin-app & origin-vars)"]
         SCMQuery -->|"3. Triggers Build"| JenkinsAgent1["⚙️ Ephemeral Agent Pod<br/>(bwce-builder)"]
         JenkinsAgent1 -->|"4. Builds EAR & Image"| Reg1["🐳 Container Registry<br/>(Internal Dev Registry)"]
-        JenkinsAgent1 -->|"5. Commits to GitOps Repo"| GitOps1["🌐 GitOps Repo<br/>(jenkins-*-global-vars)"]
+        JenkinsAgent1 -->|"5. Commits to GitOps Repo"| GitOps1["🌐 GitOps Repo<br/>(global-vars)"]
         JenkinsAgent1 -->|"6. Calls argoAppSync"| Argo1["🐙 ArgoCD 3.5 Controller<br/>(Triggers Sync)"]
         Argo1 -->|"7. Reconciles State"| Cluster1["☸️ OpenShift Cluster<br/>(DEV / STG / PROD)"]
     end
 
-    subgraph Pattern2["Pattern 2: Pure GitOps Native Selection (jenkins-without-git-parameter-bwce)"]
+    subgraph Pattern2["Pattern 2: Pure GitOps Native Selection (This Repo)"]
         direction TB
         Dev2["👩‍💻 Developer"] -->|"1. Git PR / Release Tag"| Git2["🐙 Git Repository (SSOT)<br/>(App Code & GitOps)"]
         Git2 -.->|"2. Webhook Event"| JenkinsCI["🏗️ Lean Jenkins CI<br/>(Multibranch Webhook)"]
@@ -276,7 +278,7 @@ flowchart TB
         GitOps2 -->|"6. Native targetRevision"| Argo2["🐙 ArgoCD 3.5 Controller<br/>(ApplicationSets)"]
         Argo2 -->|"7. Self-Healing Sync"| Cluster2["☸️ OpenShift Cluster<br/>(DEV / STG / PROD)"]
         
-        Dev2 -.->|"Optional: Direct Revision Override"| Argo2
+        Dev2 -.->|"Optional: Direct Override"| Argo2
     end
 ```
 
@@ -294,7 +296,7 @@ flowchart TB
 flowchart TB
     subgraph LegacyModel["1. Legacy Push Model (jenkins-git-parameter-bwce)"]
         direction TB
-        AppRepo1["📦 BWCE App Repository<br/>(tibco-bwce-order-service)"]
+        AppRepo1["📦 BWCE App Repo<br/>(tibco-bwce-order-service)"]
         GlobalVars1["🌐 Global Vars Repo<br/>(jenkins-*-global-vars)"]
         Jenkins1["⚙️ Jenkins Master<br/>• Dropdown 1: BWCE Branch<br/>• Dropdown 2: Global Vars Tag"]
         Cluster1["☸️ Target OpenShift Clusters<br/>(DEV / STG / PROD)"]
@@ -306,7 +308,7 @@ flowchart TB
 
     subgraph GitOpsModel["2. Pure GitOps Model (jenkins-without-git-parameter-bwce)"]
         direction TB
-        AppRepo2["📦 BWCE App Repository<br/>(tibco-bwce-order-service)"]
+        AppRepo2["📦 BWCE App Repo<br/>(tibco-bwce-order-service)"]
         Jenkins2["🏗️ Jenkins CI (Lean)<br/>• Builds EAR & container image<br/>• Signs with Cosign SLSA 3<br/>• Auto-commits image tag"]
         GitOpsRepo["🌐 GitOps Repo (ArgoCD SSOT)<br/>• clusters.yaml<br/>• overlays: dev, staging, prod"]
         ArgoCD["🐙 ArgoCD 3.5 Controller<br/>(Continuous Sync Engine)"]
@@ -334,7 +336,7 @@ flowchart TB
     subgraph DeveloperWorkspace["1. Developer & Git Ecosystem (Single Source of Truth)"]
         Dev["👩‍💻 Developer / Release Ops"]
         AppRepo["📦 BWCE App Repository<br/>(tibco-bwce-order-service)"]
-        GitOpsRepo["🌐 GitOps Repository<br/>(jenkins-without-git-parameter-bwce)"]
+        GitOpsRepo["🌐 GitOps Repository<br/>(GitOps Manifests)"]
         GitHubPR["🔀 GitHub Pull Requests"]
     end
 
@@ -498,10 +500,10 @@ sequenceDiagram
     Jenkins->>Registry: Push image: tibco-bwce-order-service:pr-42-sha7
     
     GitHub->>ArgoCD: PR Generator polls GitHub API
-    Note over ArgoCD: Discovers PR #42 with label 'preview-environment'
+    Note over ArgoCD: Discovers PR #42<br/>label: preview-environment
     ArgoCD->>Cluster: Provision Namespace 'pr-preview-42-bwce'
-    ArgoCD->>Cluster: Deploy BWCE (revision: head_sha, profile: DEV.substvar)
-    ArgoCD-->>GitHub: Post Preview URL Comment in PR #42
+    ArgoCD->>Cluster: Deploy BWCE (head_sha, DEV.substvar)
+    ArgoCD-->>GitHub: Post Preview URL in PR #42
     
     Dev->>Cluster: Verify integration flow on live preview environment
     
@@ -535,18 +537,18 @@ sequenceDiagram
     Jenkins->>Jenkins: Package EAR with bw6-maven-plugin
     Jenkins->>Jenkins: Execute BWUnit Process Tests
     Jenkins->>Jenkins: Generate Syft SBOM & Scan with Trivy
-    Jenkins->>Registry: Push container image (tibco/bwce base + EAR)
-    Jenkins->>Registry: Sign container image with Cosign SLSA 3
+    Jenkins->>Registry: Push image (BWCE base + EAR)
+    Jenkins->>Registry: Sign image with Cosign (SLSA 3)
     
-    Jenkins->>GitOps: Execute gitopsCommit(appName, newTag, env)
-    Note over Jenkins,GitOps: Updates kustomization.yaml with Bot identity
+    Jenkins->>GitOps: gitopsCommit(app, tag, env)
+    Note over Jenkins,GitOps: Updates kustomization.yaml<br/>with Bot identity
     deactivate Jenkins
 
     GitOps->>ArgoCD: Git Webhook / Sync Polling (targetRevision: main)
     activate ArgoCD
     ArgoCD->>ArgoCD: Detect Manifest Diff (Out of Sync)
     ArgoCD->>OCP: Reconcile & Rollout Deployment to DEV
-    ArgoCD->>OCP: Verify Health Checks (HTTP 200 /actuator/health)
+    ArgoCD->>OCP: Verify Health (HTTP 200)
     deactivate ArgoCD
 ```
 
@@ -564,11 +566,11 @@ sequenceDiagram
 flowchart TB
     subgraph GitOpsSource["1. GitOps Repository (Single Source of Truth)"]
         Manifests["📁 Workload Overlays<br/>sample-apps/tibco-bwce-order-service/k8s/*"]
-        ClusterList["📋 Cluster Inventory<br/>config/clusters.yaml (dev, staging, prod)"]
+        ClusterList["📋 Cluster Inventory<br/>config/clusters.yaml"]
     end
 
     subgraph AppSetEngine["2. ArgoCD ApplicationSet Matrix Generator"]
-        Matrix["⚙️ Matrix Generator Engine:<br/>Combines [Clusters] x [Workload Overlays]"]
+        Matrix["⚙️ Matrix Generator Engine:<br/>Combines [Clusters] x [Overlays]"]
         AppDev["Application: bwce-order-dev<br/>(targetRevision: main, DEV.substvar)"]
         AppStg["Application: bwce-order-staging<br/>(targetRevision: staging, STAGING.substvar)"]
         AppPrd["Application: bwce-order-prod<br/>(targetRevision: prod, PROD.substvar)"]
@@ -618,7 +620,7 @@ flowchart TB
 
     JenkinsMaster -->|Spawns| JenkinsAgent
     JenkinsAgent -->|"Pushes Artifacts & Signatures"| Registry
-    JenkinsAgent -->|"Commits Image Digest via GitHub App"| GitRepo
+    JenkinsAgent -->|"Commits Digest via GitHub App"| GitRepo
     
     JenkinsAgent -.->|"⛔ BLOCKED: No Direct Access"| DEV
     JenkinsAgent -.->|"⛔ BLOCKED: No Direct Access"| STG
@@ -674,7 +676,7 @@ flowchart TB
 ```mermaid
 flowchart LR
     subgraph PipelineSpan["1. Jenkins CI Span"]
-        JTrace["Datadog CI Visibility<br/>Trace ID: 7492048291048"]
+        JTrace["Datadog CI Visibility<br/>Trace ID: 7492...048"]
         JBuild["mvn package bw6 EAR"]
         JSign["cosign sign & syft sbom"]
     end
