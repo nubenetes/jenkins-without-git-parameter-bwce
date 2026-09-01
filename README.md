@@ -564,19 +564,22 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-    subgraph GitOpsSource["1. GitOps Repository (Single Source of Truth)"]
-        Manifests["📁 Workload Overlays<br/>sample-apps/tibco-bwce-order-service/k8s/*"]
-        ClusterList["📋 Cluster Inventory<br/>config/clusters.yaml"]
+    subgraph GitOpsSource["1. GitOps Repository (SSOT)"]
+        direction TB
+        Manifests["📁 Workload Overlays<br/>k8s/overlays/<br/>(dev, staging, prod)"]
+        ClusterList["📋 Cluster Inventory<br/>config/clusters.yaml<br/>(dev, staging, prod)"]
     end
 
-    subgraph AppSetEngine["2. ArgoCD ApplicationSet Matrix Generator"]
-        Matrix["⚙️ Matrix Generator Engine:<br/>Combines [Clusters] x [Overlays]"]
-        AppDev["Application: bwce-order-dev<br/>(targetRevision: main, DEV.substvar)"]
-        AppStg["Application: bwce-order-staging<br/>(targetRevision: staging, STAGING.substvar)"]
-        AppPrd["Application: bwce-order-prod<br/>(targetRevision: prod, PROD.substvar)"]
+    subgraph AppSetEngine["2. ApplicationSet Matrix Generator"]
+        direction TB
+        Matrix["⚙️ Matrix Engine:<br/>Combines [Clusters]<br/>x [Overlays]"]
+        AppDev["Application: bwce-dev<br/>• targetRevision: main<br/>• profile: DEV.substvar"]
+        AppStg["Application: bwce-staging<br/>• targetRevision: staging<br/>• profile: STAGING.substvar"]
+        AppPrd["Application: bwce-prod<br/>• targetRevision: prod<br/>• profile: PROD.substvar"]
     end
 
     subgraph TargetClusters["3. Multi-Cluster OpenShift Runtime"]
+        direction TB
         OCPDev["☸️ OCP DEV Cluster<br/>(nubenetes-dev-bwce)"]
         OCPStg["☸️ OCP STAGING Cluster<br/>(nubenetes-staging-bwce)"]
         OCPPrd["☸️ OCP PROD Cluster<br/>(nubenetes-prod-bwce)"]
