@@ -523,6 +523,13 @@ flowchart TB
 
 </details>
 
+#### 📋 Key Contrasts (Proxy vs. Native):
+* **Pattern 1: Jenkins Parameter Proxy (Legacy Push)**:
+  * Developer opens Jenkins UI form ➔ Selects BWCE app branch & substvar tag ➔ Jenkins queries remote Git SCM ➔ Builds EAR & image ➔ Agent holds cluster tokens and commits/pushes to OpenShift.
+* **Pattern 2: Pure GitOps Native Selection (Recommended)**:
+  * Developer creates Git PR or tag ➔ Webhook triggers parameterless Jenkins CI ➔ Builds EAR, runs BWUnit tests, signs image ➔ Auto-commits digest to GitOps repo ➔ ArgoCD continuously pulls and reconciles OpenShift state.
+
+
 ---
 
 ### 2. Legacy Global-Vars vs. Pure GitOps Repository Topology
@@ -560,6 +567,11 @@ flowchart TB
 ```
 
 </details>
+
+#### 📋 Repository Decoupling Highlights:
+* **Legacy Topology**: Application repo and `jenkins-*-global-vars` repo coordinated via Jenkins UI parameters.
+* **Pure GitOps Topology**: Self-contained GitOps repository structure where ArgoCD owns cluster state and environment overlays (`DEV.substvar`, `STAGING.substvar`, `PROD.substvar`), while Jenkins runs 100% automated via webhooks.
+
 
 ---
 
@@ -647,6 +659,17 @@ flowchart TB
 
 </details>
 
+#### 📋 Architectural Breakdown & Workflow Steps:
+* **Developer & Git Ecosystem (SSOT)**:
+  * TIBCO BWCE project source code and declarative GitOps manifests live in a unified version-controlled repository.
+* **Lean Jenkins CI (DEV Cluster)**:
+  * Webhook-triggered multibranch pipeline builds EAR with `bw6-maven-plugin`, executes BWUnit tests, layers onto `tibco/bwce:2.9.2`, signs with Cosign SLSA 3, and auto-commits digest to Git.
+* **ArgoCD 3.5 GitOps Engine**:
+  * Reconciles BWCE workloads across DEV (`DEV.substvar`), STAGING (`STAGING.substvar`), and PROD (`PROD.substvar`).
+* **Datadog Full-Stack Observability**:
+  * Datadog Cluster Agent and APM tracing (`dd-java-agent.jar`) provide continuous performance monitoring and canary SLA validation.
+
+
 ---
 
 ### 4. Jenkins SCM Pre-Execution Lifecycle Blindspot
@@ -682,6 +705,11 @@ flowchart TB
 
 </details>
 
+#### 📋 Why Git Parameter Fails for BWCE:
+* **The Pre-Execution Paradox**: Jenkins calculates parameter dropdowns before agent allocation; dynamic stage checkouts for `.substvar` files are invisible during UI rendering.
+* **The GitOps Solution**: Pure GitOps removes Jenkins from the parameter selection path; environment profiles are bound declaratively in Kustomize overlays.
+
+
 ---
 
 ### 5. Side-by-Side Flow Comparison: Push vs. Pull
@@ -711,6 +739,11 @@ flowchart LR
 ```
 
 </details>
+
+#### 📋 Key Contrasts (Push vs. Pull for BWCE):
+* **Pattern A: Jenkins Push Model (Legacy)**: Jenkins agent compiles EAR, holds OpenShift credentials, and pushes directly to cluster.
+* **Pattern B: Pure GitOps Pull Model (Recommended)**: Jenkins compiles EAR and signs image; ArgoCD pulls manifests and reconciles BWCE pods with zero cluster secrets in CI.
+
 
 ---
 
@@ -748,6 +781,14 @@ sequenceDiagram
 ```
 
 </details>
+
+#### 📋 Ephemeral Preview Lifecycle Steps:
+* **1. PR Creation**: Developer opens PR #42 with label `preview-environment`.
+* **2. CI Build**: Jenkins packages EAR, runs BWUnit tests, scans with Trivy, signs with Cosign, and pushes image `bwce:pr-42-sha7`.
+* **3. Ephemeral Namespace Provisioning**: ArgoCD ApplicationSet PR Generator creates namespace `pr-preview-42-bwce` and deploys BWCE with `DEV.substvar`.
+* **4. Integration Testing**: ArgoCD comments on GitHub PR with live preview URL for integration testing.
+* **5. Automated Teardown**: Closing PR #42 triggers ArgoCD to destroy the preview namespace automatically.
+
 
 ---
 
@@ -788,6 +829,14 @@ sequenceDiagram
 
 </details>
 
+#### 📋 Continuous Promotion Execution Chain:
+* **1. Git Trigger**: Push to `main` triggers Jenkins multibranch pipeline.
+* **2. Package & Test**: Packages EAR via `bw6-maven-plugin`, executes BWUnit tests, and generates Syft SBOM.
+* **3. Supply Chain Hardening**: Signs container image with Cosign (SLSA Level 3) and scans with Trivy.
+* **4. GitOps Auto-Commit**: Auto-commits new image digest to `kustomization.yaml` using Bot identity.
+* **5. ArgoCD Deployment**: ArgoCD reconciles DEV cluster and verifies HTTP 200 health check.
+
+
 ---
 
 ### 8. ArgoCD Multi-Cluster Matrix Reconciliation Engine for BWCE
@@ -826,6 +875,12 @@ flowchart TB
 ```
 
 </details>
+
+#### 📋 Matrix Generation Mechanics:
+* **Input 1 (Overlays & Profiles)**: Kustomize overlays defining `BW_PROFILE: DEV.substvar`, `STAGING.substvar`, and `PROD.substvar`.
+* **Input 2 (Cluster Inventory)**: `config/clusters.yaml` defining target OpenShift cluster API endpoints.
+* **Matrix Output**: ApplicationSet automatically materializes `bwce-dev`, `bwce-staging`, and `bwce-prod`.
+
 
 ---
 
@@ -872,6 +927,12 @@ flowchart TB
 
 </details>
 
+#### 📋 Zero-Trust Security & Isolation Principles:
+* **CI Zone (Least Privilege)**: Jenkins holds zero cluster-admin credentials and cannot deploy directly to OpenShift.
+* **GitOps Control Plane**: Only ArgoCD holds short-lived service account tokens to apply Kubernetes manifests.
+* **Protected Runtime**: BWCE pods run under OpenShift `SCC restricted-v2` with non-root user execution.
+
+
 ---
 
 ### 10. Progressive Delivery with Argo Rollouts & Datadog SLA
@@ -905,6 +966,12 @@ flowchart TB
 ```
 
 </details>
+
+#### 📋 Canary Rollout & Datadog Analysis Steps:
+* **1. Traffic Split**: Routes 20% traffic to canary BWCE pods and 80% to stable pods.
+* **2. Datadog APM SLA Analysis**: Evaluates error rate $< 0.5\%$ and p95 latency $< 200	ext{ms}$ over 5 minutes.
+* **3. Promotion / Rollback**: Scales to 50% and 100% on SLA success; executes instant automated rollback if SLA is breached.
+
 
 ---
 
@@ -947,6 +1014,13 @@ flowchart LR
 ```
 
 </details>
+
+#### 📋 End-to-End Tracing Journey:
+* **1. Jenkins CI Visibility**: Datadog CI plugin captures build spans, EAR compilation time, and test results.
+* **2. GitOps & ArgoCD Span**: Injects trace ID into Git commit metadata and correlates deployment syncs.
+* **3. BWCE Runtime Tracing**: Injects `dd-java-agent.jar` at JVM startup to trace BWCE REST activities and database palettes.
+* **4. Unified Datadog Dashboard**: Correlates pipeline metrics, deployment events, and live APM traces in real time.
+
 
 ---
 
