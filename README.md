@@ -155,31 +155,31 @@ For enterprise integration platforms hosting **TIBCO BusinessWorks™ Container 
 
 ```mermaid
 flowchart TB
-    subgraph P1["Pattern 1: Monolithic Dual Dropdown (Push)"]
+    subgraph P1["Pattern 1: Push"]
         direction TB
-        Dev1["👩‍💻 User"] -->|"1. Selects App & Substvar Dropdowns"| JJob1["📋 Single Pipeline<br/>(Multi-Remote SCM origin-app & origin-vars)"]
-        JJob1 -->|"2. Builds EAR & Deploys"| Agent1["⚙️ Jenkins Agent<br/>(Holds Cluster Secrets)"]
+        Dev1["👩‍💻 User"] -->|"1. Select Dropdowns"| JJob1["📋 Single Pipeline<br/>• Multi-Remote SCM<br/>• origin-app<br/>• origin-vars"]
+        JJob1 -->|"2. Builds & Deploys"| Agent1["⚙️ Jenkins Agent<br/>• Cluster Secrets"]
         Agent1 -->|"3. Imperative Push"| K8s1["☸️ OpenShift Clusters"]
     end
 
-    subgraph P2["Pattern 2: Decoupled CI ➔ CD Hand-off (Push)"]
+    subgraph P2["Pattern 2: Hand-off"]
         direction TB
-        Dev2["👩‍💻 User"] -->|"1. Selects BWCE Branch"| CI2["🏗️ Pipeline 01: CI Build<br/>(APP_GIT_REVISION Dropdown)"]
-        CI2 -->|"2. Builds EAR & Image Once"| Reg2["🐳 Container Registry"]
-        CI2 -->|"3. Triggers Downstream"| CD2["🚀 Pipeline 02: CD Orchestrator<br/>(GLOBAL_VARS_REVISION Dropdown)"]
-        CD2 -->|"4. Skopeo Promote & Commit"| GitOps2["🌐 GitOps Repo (global-vars)"]
+        Dev2["👩‍💻 User"] -->|"1. Selects BWCE Branch"| CI2["🏗️ Pipeline 01: CI<br/>• App Git Parameter"]
+        CI2 -->|"2. Builds EAR & Image"| Reg2["🐳 Container Registry"]
+        CI2 -->|"3. Triggers Downstream"| CD2["🚀 Pipeline 02: CD<br/>• Global Vars Dropdown<br/>• Release Orchestrator"]
+        CD2 -->|"4. Skopeo & Commit"| GitOps2["🌐 GitOps Repo<br/>(global-vars)"]
         CD2 -->|"5. Calls argoAppSync"| Argo2["🐙 ArgoCD Controller"]
         Argo2 -->|"6. Syncs Cluster"| K8s2["☸️ OpenShift Clusters"]
     end
 
-    subgraph P3["Pattern 3: Pure GitOps Event-Driven Pull (Recommended)"]
+    subgraph P3["Pattern 3: Pure GitOps"]
         direction TB
-        Dev3["👩‍💻 Developer"] -->|"1. Git PR / Release Tag"| Git3["🐙 Git Repository (SSOT)<br/>(BWCE Code & GitOps Overlays)"]
-        Git3 -.->|"2. Webhook Event"| CI3["🏗️ Lean Jenkins CI<br/>(Zero UI Parameters / Multibranch)"]
-        CI3 -->|"3. Package EAR, Scan & Sign"| Reg3["🐳 Container Registry"]
-        CI3 -->|"4. Auto-commits Image Tag"| Git3
-        Git3 -->|"5. Continuous Pull & Reconcile"| Argo3["🐙 ArgoCD 3.5 Controller<br/>(Native targetRevision & AppSets)"]
-        Argo3 -->|"6. Self-Healing Sync"| K8s3["☸️ OpenShift Clusters<br/>(Zero Cluster Secrets in Jenkins)"]
+        Dev3["👩‍💻 Developer"] -->|"1. Git PR / Tag"| Git3["🐙 Git Repo (SSOT)<br/>• BWCE App Code<br/>• GitOps Overlays"]
+        Git3 -.->|"2. Webhook Event"| CI3["🏗️ Lean Jenkins CI<br/>• Zero UI Params<br/>• Multibranch Webhook"]
+        CI3 -->|"3. Package & Scan"| Reg3["🐳 Container Registry<br/>(Cosign SLSA 3)"]
+        CI3 -->|"4. Auto-commit Tag"| Git3
+        Git3 -->|"5. Continuous Sync"| Argo3["🐙 ArgoCD 3.5 Engine<br/>• targetRevision<br/>• ApplicationSets"]
+        Argo3 -->|"6. Self-Healing"| K8s3["☸️ OpenShift Runtime<br/>• Zero Secrets in CI<br/>• Multi-Cluster"]
     end
 ```
 
@@ -284,24 +284,24 @@ In Pure GitOps, the executable BWCE container image and environment-specific con
 
 ```mermaid
 flowchart LR
-    subgraph BuildTime["1. CI Build Time (Immutable BWCE Image)"]
+    subgraph BuildTime["1. CI Build (BWCE)"]
         direction TB
-        Code["📦 BWCE Studio Project<br/>(bw6-maven-plugin)"] --> Build["🏗️ Lean Jenkins CI"]
-        Build --> Image["🐳 Immutable BWCE Image<br/>(tibco/bwce:2.9.2 + EAR)<br/>• ZERO environment endpoints<br/>• ZERO hardcoded secrets"]
+        Code["📦 BWCE Studio<br/>(bw6-maven-plugin)"] --> Build["🏗️ Lean Jenkins CI"]
+        Build --> Image["🐳 Immutable BWCE Image<br/>(bwce:2.9.2 + EAR)<br/>• Zero env endpoints<br/>• Zero secrets"]
         Image --> Registry["OpenShift Registry"]
     end
 
-    subgraph Runtime["2. CD GitOps Runtime (Configuration)"]
+    subgraph Runtime["2. CD GitOps (Config)"]
         direction TB
-        Overlays["📁 GitOps Environment Manifests<br/>• BW_PROFILE: DEV.substvar<br/>• BW_PROFILE: PROD.substvar<br/>• ConfigMaps / Vault Secrets"]
-        ArgoCD["🐙 ArgoCD 3.5 Controller"]
-        Cluster["☸️ Target OpenShift Cluster"]
+        Overlays["📁 GitOps Manifests<br/>• DEV.substvar<br/>• PROD.substvar<br/>• ConfigMaps / Vault"]
+        ArgoCD["🐙 ArgoCD 3.5 Engine"]
+        Cluster["☸️ OpenShift Cluster"]
         
         Overlays --> ArgoCD
-        ArgoCD -->|"Injects Profile at Startup"| Cluster
+        ArgoCD -->|"Injects Profile"| Cluster
     end
 
-    Registry -.->|"Pulls Image by Digest"| Cluster
+    Registry -.->|"Pulls by Digest"| Cluster
 ```
 
 #### 2. Why This Repository Uses a Unified Platform Monorepo
@@ -345,26 +345,26 @@ In **Pure GitOps (`jenkins-without-git-parameter`)**, Backstage and ServiceNow i
 
 ```mermaid
 flowchart TB
-    subgraph LegacyITSM["Pattern A: Legacy Push ITSM Flow (jenkins-git-parameter Pattern 2)"]
+    subgraph LegacyITSM["Pattern A: Push ITSM"]
         direction TB
-        DevA["👩‍💻 Developer /<br/>Release Manager"] -->|"1. Opens Change Ticket"| ITSMA["📋 ServiceNow / Jira<br/>(Ticket: CHG00123)"]
-        ITSMA -->|"2. Approved: Calls API"| JMasterA["⚙️ Jenkins Master<br/>(REST API Trigger<br/>with Parameters)"]
-        JMasterA -->|"3. Runs Pipeline 02"| JAgentA["🚀 Jenkins Agent Pod<br/>(Holds Cluster Secrets<br/>& Skopeo Engine)"]
+        DevA["👩‍💻 Developer /<br/>Release Manager"] -->|"1. Opens Ticket"| ITSMA["📋 ServiceNow / Jira<br/>(CHG00123)"]
+        ITSMA -->|"2. Approved: API"| JMasterA["⚙️ Jenkins Master<br/>(REST API Trigger)"]
+        JMasterA -->|"3. Runs Pipeline 02"| JAgentA["🚀 Jenkins Agent Pod<br/>• Holds Cluster Keys<br/>• Skopeo Engine"]
         JAgentA -->|"4. Commits & Syncs"| ArgoA["🐙 ArgoCD Controller"]
         ArgoA -->|"5. Deploys"| K8sA["☸️ OpenShift PROD"]
-        JAgentA -->|"6. Closes Ticket via API"| ITSMA
-        BackstageA["🎭 Backstage IDP"] -->|"Trigger buildWithParams"| JMasterA
+        JAgentA -->|"6. Closes Ticket"| ITSMA
+        BackstageA["🎭 Backstage IDP"] -->|"Trigger Job"| JMasterA
     end
 
-    subgraph PureGitOpsITSM["Pattern B: Pure GitOps ITSM & Backstage Flow (This Repository)"]
+    subgraph PureGitOpsITSM["Pattern B: GitOps ITSM"]
         direction TB
-        DevB["👩‍💻 Developer /<br/>Release Manager"] -->|"1. Self-Service / Approval"| PortalB["🎭 Backstage / ServiceNow<br/>(Ticket: CHG00123)"]
-        PortalB -->|"2. Creates / Merges PR<br/>(Ref: CHG00123)"| GitB["🐙 GitOps Repo (SSOT)<br/>(Protected prod branch)"]
-        GitB -->|"3. Continuous Reconcile"| ArgoB["🐙 ArgoCD 3.5 Controller<br/>(AppSets & Rollouts)"]
+        DevB["👩‍💻 Developer /<br/>Release Manager"] -->|"1. Self-Service"| PortalB["🎭 Backstage / Jira<br/>(CHG00123)"]
+        PortalB -->|"2. Merge PR (CHG00123)"| GitB["🐙 GitOps Repo (SSOT)<br/>(Protected branch)"]
+        GitB -->|"3. Continuous Sync"| ArgoB["🐙 ArgoCD 3.5 Engine<br/>(AppSets & Rollouts)"]
         ArgoB -->|"4. Progressive Sync"| K8sB["☸️ OpenShift PROD"]
         
-        ArgoB -.->|"5. Notifications: SUCCESS"| PortalB
-        ArgoB -.->|"6. ArgoCD Plugin (Health)"| PortalB
+        ArgoB -.->|"5. Notifications: OK"| PortalB
+        ArgoB -.->|"6. ArgoCD Plugin"| PortalB
     end
 ```
 
@@ -385,19 +385,19 @@ sequenceDiagram
     participant Cluster as ☸️ OpenShift PROD
 
     Note over Jenkins: 1. CI Build, Syft SBOM,<br/>Trivy Scan & Cosign SLSA 3
-    Jenkins-->>ITSM: Attach Evidence (SBOM & Cosign) to CHG009876
+    Jenkins-->>ITSM: Attach Evidence (SBOM & Cosign)
     
-    Ops->>ITSM: Review Evidence & Approve CHG009876
-    ITSM->>GitHub: Merge Promotion PR #89 (CHG009876)
+    Ops->>ITSM: Review & Approve CHG009876
+    ITSM->>GitHub: Merge Promotion PR #89
     
     GitHub->>ArgoCD: Git Push Event on 'prod'
     activate ArgoCD
-    ArgoCD->>Cluster: Execute Progressive Canary (Argo Rollouts)
-    Cluster-->>ArgoCD: Health Checks (HTTP 200 & Error < 0.5%)
+    ArgoCD->>Cluster: Progressive Canary (Argo Rollouts)
+    Cluster-->>ArgoCD: Health Checks (HTTP 200)
     deactivate ArgoCD
     
-    ArgoCD-->>ITSM: Notifications: Update CHG009876 -> CLOSED
-    ArgoCD-->>ITSM: Post Deployment Audit & Metrics
+    ArgoCD-->>ITSM: Notifications: Close CHG009876
+    ArgoCD-->>ITSM: Post Deployment Audit Metrics
 ```
 
 ---
@@ -483,29 +483,28 @@ ightarrow$ 100%) and queries Datadog metrics via an `AnalysisTemplate`. If the H
 
 ```mermaid
 flowchart TB
-    subgraph Pattern1["Pattern 1: Jenkins Parameter Proxy (Legacy Push)"]
+    subgraph Pattern1["Pattern 1: Proxy"]
         direction TB
-        Dev1["👩‍💻 Developer"] -->|"1. Opens Jenkins UI"| JenkinsUI["📋 Jenkins Job Form<br/>(gitParameter Dropdowns)"]
-        JenkinsUI -->|"2. Queries Remote Refs"| SCMQuery["🔍 Jenkins Master SCM Query<br/>(origin-app & origin-vars)"]
+        Dev1["👩‍💻 Developer"] -->|"1. Opens Jenkins UI"| JenkinsUI["📋 Jenkins Job Form<br/>(Git Dropdown)"]
+        JenkinsUI -->|"2. Queries Remote SCM"| SCMQuery["🔍 Jenkins SCM Query<br/>(origin-app & vars)"]
         SCMQuery -->|"3. Triggers Build"| JenkinsAgent1["⚙️ Ephemeral Agent Pod<br/>(bwce-builder)"]
-        JenkinsAgent1 -->|"4. Builds EAR & Image"| Reg1["🐳 Container Registry<br/>(Internal Dev Registry)"]
-        JenkinsAgent1 -->|"5. Commits to GitOps Repo"| GitOps1["🌐 GitOps Repo<br/>(global-vars)"]
-        JenkinsAgent1 -->|"6. Calls argoAppSync"| Argo1["🐙 ArgoCD 3.5 Controller<br/>(Triggers Sync)"]
+        JenkinsAgent1 -->|"4. Builds EAR & Image"| Reg1["🐳 Container Registry<br/>(Dev Registry)"]
+        JenkinsAgent1 -->|"5. Commits to GitOps"| GitOps1["🌐 GitOps Repo<br/>(global-vars)"]
+        JenkinsAgent1 -->|"6. Calls argoAppSync"| Argo1["🐙 ArgoCD Controller<br/>(Triggers Sync)"]
         Argo1 -->|"7. Reconciles State"| Cluster1["☸️ OpenShift Cluster<br/>(DEV / STG / PROD)"]
     end
 
-    subgraph Pattern2["Pattern 2: Pure GitOps Native Selection (This Repo)"]
+    subgraph Pattern2["Pattern 2: Pure GitOps"]
         direction TB
-        Dev2["👩‍💻 Developer"] -->|"1. Git PR / Release Tag"| Git2["🐙 Git Repository (SSOT)<br/>(App Code & GitOps)"]
+        Dev2["👩‍💻 Developer"] -->|"1. Git PR / Tag"| Git2["🐙 Git Repo (SSOT)<br/>(App Code & GitOps)"]
         Git2 -.->|"2. Webhook Event"| JenkinsCI["🏗️ Lean Jenkins CI<br/>(Multibranch Webhook)"]
-        JenkinsCI -->|"3. Build EAR & Scan"| Reg2
-        JenkinsCI -->|"4. Pushes Signed Image"| Reg2["🐳 Container Registry<br/>(SLSA Level 3)"]
-        JenkinsCI -->|"5. Auto-Commits Tag"| GitOps2["🌐 GitOps Manifests<br/>(Overlays & Clusters)"]
+        JenkinsCI -->|"3. Build EAR & Scan"| Reg2["🐳 Container Registry<br/>(SLSA Level 3)"]
+        JenkinsCI -->|"4. Auto-Commits Tag"| GitOps2["🌐 GitOps Manifests<br/>(Overlays & Clusters)"]
         
-        GitOps2 -->|"6. Native targetRevision"| Argo2["🐙 ArgoCD 3.5 Controller<br/>(ApplicationSets)"]
-        Argo2 -->|"7. Self-Healing Sync"| Cluster2["☸️ OpenShift Cluster<br/>(DEV / STG / PROD)"]
+        GitOps2 -->|"5. Native Revision"| Argo2["🐙 ArgoCD 3.5 Engine<br/>(ApplicationSets)"]
+        Argo2 -->|"6. Self-Healing Sync"| Cluster2["☸️ OpenShift Cluster<br/>(DEV / STG / PROD)"]
         
-        Dev2 -.->|"Optional: Direct Override"| Argo2
+        Dev2 -.->|"Direct Override"| Argo2
     end
 ```
 
@@ -517,30 +516,30 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph LegacyModel["1. Legacy Push Model (jenkins-git-parameter-bwce)"]
+    subgraph LegacyModel["1. Legacy Push Model"]
         direction TB
-        AppRepo1["📦 BWCE App Repo<br/>(tibco-bwce-order-service)"]
-        GlobalVars1["🌐 Global Vars Repo<br/>(jenkins-*-global-vars)"]
-        Jenkins1["⚙️ Jenkins Master<br/>• Dropdown 1: BWCE Branch<br/>• Dropdown 2: Global Vars Tag"]
-        Cluster1["☸️ Target OpenShift Clusters<br/>(DEV / STG / PROD)"]
+        AppRepo1["📦 BWCE App Repo<br/>(tibco-order-service)"]
+        GlobalVars1["🌐 Global Vars Repo<br/>(global-vars)"]
+        Jenkins1["⚙️ Jenkins Master<br/>• Dropdown 1: BWCE<br/>• Dropdown 2: Vars"]
+        Cluster1["☸️ OpenShift Clusters<br/>(DEV / STG / PROD)"]
 
         AppRepo1 --> Jenkins1
         GlobalVars1 --> Jenkins1
-        Jenkins1 -->|"Imperative Push Deploy"| Cluster1
+        Jenkins1 -->|"Imperative Push"| Cluster1
     end
 
-    subgraph GitOpsModel["2. Pure GitOps Model (jenkins-without-git-parameter-bwce)"]
+    subgraph GitOpsModel["2. Pure GitOps Model"]
         direction TB
-        AppRepo2["📦 BWCE App Repo<br/>(tibco-bwce-order-service)"]
-        Jenkins2["🏗️ Jenkins CI (Lean)<br/>• Builds EAR & container image<br/>• Signs with Cosign SLSA 3<br/>• Auto-commits image tag"]
-        GitOpsRepo["🌐 GitOps Repo (ArgoCD SSOT)<br/>• clusters.yaml<br/>• overlays: dev, staging, prod"]
-        ArgoCD["🐙 ArgoCD 3.5 Controller<br/>(Continuous Sync Engine)"]
-        Cluster2["☸️ Target OpenShift Clusters<br/>(Self-Healing State)"]
+        AppRepo2["📦 BWCE App Repo<br/>(sample-apps)"]
+        Jenkins2["🏗️ Lean Jenkins CI<br/>• Builds EAR & Image<br/>• Signs (SLSA 3)<br/>• Auto-commits tag"]
+        GitOpsRepo["🌐 GitOps Repo (SSOT)<br/>• clusters.yaml<br/>• overlays:<br/>(dev, stg, prod)"]
+        ArgoCD["🐙 ArgoCD 3.5 Engine<br/>(Continuous Sync)"]
+        Cluster2["☸️ OpenShift Clusters<br/>(DEV / STG / PROD)"]
 
-        AppRepo2 -->|"Webhook on Push"| Jenkins2
-        Jenkins2 -->|"Auto-commits tag"| GitOpsRepo
-        GitOpsRepo -->|"Continuous Pull & Reconcile"| ArgoCD
-        ArgoCD -->|"Declarative Sync"| Cluster2
+        AppRepo2 -.->|"Webhook"| Jenkins2
+        Jenkins2 -->|"Auto-commits Tag"| GitOpsRepo
+        GitOpsRepo -->|"Continuous Sync"| ArgoCD
+        ArgoCD -->|"Declarative Pull"| Cluster2
     end
 ```
 
@@ -552,7 +551,7 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph DeveloperWorkspace["1. Developer & Git Ecosystem (SSOT)"]
+    subgraph DeveloperWorkspace["1. Dev & Git (SSOT)"]
         direction TB
         Dev["👩‍💻 Developer /<br/>Release Manager"]
         AppRepo["📦 BWCE App Repo<br/>(sample-apps/bwce)"]
@@ -560,9 +559,9 @@ flowchart TB
         GitHubPR["🔀 GitHub Pull Requests"]
     end
 
-    subgraph OCP_DEV["Cluster 1: DEV (Control Plane & Workloads)"]
+    subgraph OCP_DEV["Cluster 1: DEV"]
         direction TB
-        subgraph JenkinsPlatform["Jenkins Controller (Lean CI)"]
+        subgraph JenkinsPlatform["Jenkins CI (Lean)"]
             Master["Jenkins Controller<br/>(JCasC & Multibranch)"]
             Seed["00-Seed-Job<br/>Provisioner"]
             CIJob["01-Multibranch-CI<br/>(Webhook Triggered)"]
@@ -573,14 +572,14 @@ flowchart TB
             SecurityAgent["security-tools Agent<br/>(Cosign & Syft)"]
         end
 
-        subgraph OCPDevRegistry["Internal Registry (DEV)"]
+        subgraph OCPDevRegistry["Internal Registry"]
             DevReg["image-registry:5000<br/>nubenetes-dev-bwce"]
         end
 
         subgraph ArgoCDMaster["ArgoCD 3.5 Engine"]
             ArgoServer["ArgoCD Server &<br/>ApplicationSets"]
             PRGen["PR Preview Generator"]
-            MatrixGen["Cluster Matrix Generator"]
+            MatrixGen["Matrix Generator"]
         end
 
         subgraph ObservabilityStack["Datadog Full-Stack"]
@@ -592,11 +591,11 @@ flowchart TB
         PreviewApps["Ephemeral PR Previews<br/>(pr-preview-*-bwce)"]
     end
 
-    subgraph OCP_STG["Cluster 2: STAGING (UAT)"]
+    subgraph OCP_STG["Cluster 2: STAGING"]
         StgApps["Staging Workloads<br/>(STAGING.substvar)"]
     end
 
-    subgraph OCP_PRD["Cluster 3: PROD (High Availability)"]
+    subgraph OCP_PRD["Cluster 3: PROD"]
         PrdApps["Production Workloads<br/>(PROD.substvar)"]
         Rollout["Argo Rollouts<br/>(Canary & Datadog SLA)"]
     end
@@ -612,7 +611,7 @@ flowchart TB
     BwceAgent -->|"Build EAR & Image"| DevReg
     CIJob -->|"Spawns"| SecurityAgent
     SecurityAgent -->|"Cosign & Syft"| DevReg
-    SecurityAgent -->|"3. Auto-commit Digest"| GitOpsRepo
+    SecurityAgent -->|"3. Commit Digest"| GitOpsRepo
 
     %% ArgoCD GitOps Flow
     GitOpsRepo -->|"Continuous Sync"| ArgoServer
@@ -635,25 +634,25 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph UI_Phase["1. Pre-Execution Phase (Master)"]
+    subgraph UI_Phase["1. Master (Pre-Exec)"]
         direction TB
         User["👤 User opens<br/>Build UI Form"]
-        Master["⚙️ Jenkins Master<br/>reads Job XML SCM"]
-        GitParam["🔍 git-parameter<br/>queries remote SCM refs"]
+        Master["⚙️ Jenkins Master<br/>reads Job XML"]
+        GitParam["🔍 git-parameter<br/>queries SCM refs"]
         Dropdown["📋 Renders Branch/Tag<br/>Dropdown in Browser"]
 
         User --> Master --> GitParam --> Dropdown
     end
 
-    subgraph Runtime_Phase["2. Runtime Execution Phase (Agent)"]
+    subgraph Runtime_Phase["2. Runtime (Agent)"]
         direction TB
         AllocAgent["☸️ Ephemeral Agent<br/>Pod Allocated"]
-        RunStage["📦 Pipeline Stage:<br/>checkout secondary repo"]
+        RunStage["📦 Pipeline Stage:<br/>checkout repo 2"]
 
         AllocAgent --> RunStage
     end
 
-    Gap["⚠️ SCM Blindspot:<br/>Dynamic stage checkouts happen<br/>at runtime on the agent and are<br/>invisible during parameter render!"]
+    Gap["⚠️ SCM Blindspot:<br/>Dynamic checkouts<br/>occur during build and<br/>invisible at render"]
 
     Dropdown -.-> Gap
     Gap -.-> RunStage
@@ -667,22 +666,22 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph PatternA["PATTERN A: Jenkins Git Parameter (Push Model)"]
+    subgraph PatternA["Pattern A: Push Model"]
         direction TB
-        A1["👩‍💻 User Opens<br/>Jenkins UI"] --> A2["📋 Selects Branches/Tags<br/>in Dropdown"]
+        A1["👩‍💻 User Opens<br/>Jenkins UI"] --> A2["📋 Selects Branch/Tag<br/>in Dropdown"]
         A2 --> A3["⚙️ Jenkins Master<br/>Queries Git SCM"]
         A3 --> A4["📦 Jenkins Agent<br/>Builds BWCE EAR"]
-        A4 --> A5["🚀 Jenkins Agent Pushes<br/>Directly to Cluster<br/>(oc apply / argo sync)"]
-        A5 --> A6["⚠️ Problem: Jenkins holds<br/>cluster secrets & drift occurs"]
+        A4 --> A5["🚀 Agent Pushes<br/>Direct to Cluster<br/>(oc apply / sync)"]
+        A5 --> A6["⚠️ Jenkins holds<br/>secrets in CI & drift"]
     end
 
-    subgraph PatternB["PATTERN B: Pure GitOps (Pull Model - This Repo)"]
+    subgraph PatternB["Pattern B: Pull GitOps"]
         direction TB
         B1["👩‍💻 Developer Pushes<br/>to Git / Opens PR"] --> B2["⚡ Webhook Triggers<br/>Jenkins CI"]
-        B2 --> B3["📦 Jenkins Builds EAR, Scans<br/>& Signs Image (SLSA 3)"]
-        B3 --> B4["📝 Jenkins Auto-Commits<br/>Tag to GitOps Repo"]
-        B4 --> B5["🔄 ArgoCD Pulls &<br/>Reconciles Cluster State"]
-        B5 --> B6["✅ Result: Zero cluster secrets<br/>in CI & self-healing drift"]
+        B2 --> B3["📦 Jenkins Builds EAR &<br/>Signs Image (SLSA 3)"]
+        B3 --> B4["📝 Auto-Commits Tag<br/>to GitOps Repo"]
+        B4 --> B5["🔄 ArgoCD Pulls &<br/>Reconciles Cluster"]
+        B5 --> B6["✅ Result: Zero secrets<br/>in CI & self-healing"]
     end
 ```
 
@@ -708,7 +707,7 @@ sequenceDiagram
     Jenkins->>Registry: Push image: bwce:pr-42-sha7
     
     GitHub->>ArgoCD: Polling / PR Webhook
-    Note over ArgoCD: Discovers PR #42<br/>label: preview-environment
+    Note over ArgoCD: Discovers PR #42<br/>label: preview-env
     ArgoCD->>Cluster: Create ns 'pr-preview-42-bwce'
     ArgoCD->>Cluster: Deploy BWCE (head_sha, DEV.substvar)
     ArgoCD-->>GitHub: Post Preview URL in PR #42
@@ -717,7 +716,7 @@ sequenceDiagram
     
     Dev->>GitHub: Merge PR #42 into main
     GitHub->>ArgoCD: PR closed event
-    ArgoCD->>Cluster: Tear down namespace 'pr-preview-42-bwce'
+    ArgoCD->>Cluster: Tear down ns 'pr-preview-42-bwce'
 ```
 
 ---
@@ -740,15 +739,15 @@ sequenceDiagram
     activate Jenkins
     Jenkins->>Jenkins: Package EAR with bw6-maven-plugin
     Jenkins->>Jenkins: Execute BWUnit Process Tests
-    Jenkins->>Jenkins: Generate Syft SBOM & Scan (Trivy)
+    Jenkins->>Jenkins: Syft SBOM & Trivy Scan
     Jenkins->>Registry: Push image (BWCE base + EAR)
-    Jenkins->>Registry: Sign image with Cosign (SLSA 3)
+    Jenkins->>Registry: Sign with Cosign (SLSA 3)
     
     Jenkins->>GitOps: gitopsCommit(app, tag, env)
     Note over Jenkins,GitOps: Updates kustomization.yaml<br/>with Bot identity
     deactivate Jenkins
 
-    GitOps->>ArgoCD: Webhook / Polling (target: main)
+    GitOps->>ArgoCD: Webhook / Sync Polling
     activate ArgoCD
     ArgoCD->>ArgoCD: Detect Out-of-Sync Manifest Diff
     ArgoCD->>OCP: Reconcile & Deploy to DEV
@@ -764,25 +763,25 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-    subgraph GitOpsSource["1. GitOps Repository (SSOT)"]
+    subgraph GitOpsSource["1. GitOps Repo (SSOT)"]
         direction TB
-        Manifests["📁 Workload Overlays<br/>k8s/overlays/<br/>(dev, staging, prod)"]
-        ClusterList["📋 Cluster Inventory<br/>config/clusters.yaml<br/>(dev, staging, prod)"]
+        Manifests["📁 Workload Overlays<br/>• k8s/overlays/dev<br/>• k8s/overlays/stg<br/>• k8s/overlays/prod"]
+        ClusterList["📋 Cluster Inventory<br/>• config/clusters.yaml<br/>(dev, staging, prod)"]
     end
 
-    subgraph AppSetEngine["2. ApplicationSet Matrix Generator"]
+    subgraph AppSetEngine["2. AppSet Engine"]
         direction TB
         Matrix["⚙️ Matrix Engine:<br/>Combines Clusters<br/>x Overlays"]
-        AppDev["Application: bwce-dev<br/>• targetRevision: main<br/>• profile: DEV.substvar"]
-        AppStg["Application: bwce-staging<br/>• targetRevision: staging<br/>• profile: STAGING.substvar"]
-        AppPrd["Application: bwce-prod<br/>• targetRevision: prod<br/>• profile: PROD.substvar"]
+        AppDev["Application: dev<br/>• target: main<br/>• DEV.substvar"]
+        AppStg["Application: staging<br/>• target: staging<br/>• STAGING.substvar"]
+        AppPrd["Application: prod<br/>• target: prod<br/>• PROD.substvar"]
     end
 
-    subgraph TargetClusters["3. Multi-Cluster OpenShift Runtime"]
+    subgraph TargetClusters["3. OpenShift Runtime"]
         direction TB
-        OCPDev["☸️ OCP DEV Cluster<br/>(nubenetes-dev-bwce)"]
-        OCPStg["☸️ OCP STAGING Cluster<br/>(nubenetes-staging-bwce)"]
-        OCPPrd["☸️ OCP PROD Cluster<br/>(nubenetes-prod-bwce)"]
+        OCPDev["☸️ OCP DEV Cluster<br/>(dev-bwce)"]
+        OCPStg["☸️ OCP STAGING Cluster<br/>(staging-bwce)"]
+        OCPPrd["☸️ OCP PROD Cluster<br/>(prod-bwce)"]
     end
 
     Manifests --> Matrix
@@ -800,38 +799,38 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph UntrustedZone["1. CI Workload Zone (Least Privilege)"]
+    subgraph UntrustedZone["1. CI Zone"]
         direction TB
-        JenkinsMaster["Jenkins Controller<br/>(No Cluster Admin RBAC)"]
-        JenkinsAgent["Ephemeral Agent Pod<br/>(bwce-builder / security-tools)"]
-        Registry["Internal Registry<br/>(Push Image & Cosign Sig)"]
+        JenkinsMaster["Jenkins Controller<br/>• No Cluster RBAC"]
+        JenkinsAgent["Ephemeral Agent Pod<br/>• bwce / security"]
+        Registry["Internal Registry<br/>• Push & Cosign Sig"]
     end
 
-    subgraph GitOpsTrustZone["2. GitOps Control Plane (High Privilege)"]
+    subgraph GitOpsTrustZone["2. GitOps Plane"]
         direction TB
-        GitRepo["Git Repository<br/>(Single Source of Truth)"]
-        ArgoCD["ArgoCD 3.5 Control Plane<br/>(Cluster Manager & AppSets)"]
+        GitRepo["Git Repository<br/>• Source of Truth"]
+        ArgoCD["ArgoCD 3.5 Engine<br/>• AppSets Engine"]
     end
 
-    subgraph WorkloadClusters["3. Protected OpenShift Runtime"]
+    subgraph WorkloadClusters["3. OpenShift Clusters"]
         direction TB
-        DEV["OCP DEV Cluster<br/>(SCC restricted-v2)"]
-        STG["OCP STAGING Cluster<br/>(SCC restricted-v2)"]
-        PRD["OCP PROD Cluster<br/>(Canary & Hardened)"]
+        DEV["OCP DEV Cluster<br/>• SCC restricted-v2"]
+        STG["OCP STAGING Cluster<br/>• SCC restricted-v2"]
+        PRD["OCP PROD Cluster<br/>• Canary & Hardened"]
     end
 
     JenkinsMaster -->|"Spawns"| JenkinsAgent
-    JenkinsAgent -->|"Push Artifacts & Sig"| Registry
-    JenkinsAgent -->|"Commit Digest via Bot"| GitRepo
+    JenkinsAgent -->|"Push Image & Sig"| Registry
+    JenkinsAgent -->|"Commit Digest"| GitRepo
     
-    JenkinsAgent -.->|"⛔ BLOCKED: No Access"| DEV
-    JenkinsAgent -.->|"⛔ BLOCKED: No Access"| STG
-    JenkinsAgent -.->|"⛔ BLOCKED: No Access"| PRD
+    JenkinsAgent -.->|"⛔ BLOCKED"| DEV
+    JenkinsAgent -.->|"⛔ BLOCKED"| STG
+    JenkinsAgent -.->|"⛔ BLOCKED"| PRD
 
     GitRepo -->|"Continuous Sync"| ArgoCD
-    ArgoCD -->|"Reconcile via SA Token"| DEV
-    ArgoCD -->|"Reconcile via SA Token"| STG
-    ArgoCD -->|"Reconcile via SA Token"| PRD
+    ArgoCD -->|"Reconcile via Token"| DEV
+    ArgoCD -->|"Reconcile via Token"| STG
+    ArgoCD -->|"Reconcile via Token"| PRD
 ```
 
 ---
@@ -842,16 +841,16 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph RolloutController["1. Argo Rollouts Progressive Engine"]
+    subgraph RolloutController["1. Argo Rollouts"]
         direction TB
         Step1["1. Initiate Canary<br/>(Set Weight to 20%)"]
-        Step2["2. Datadog APM Analysis<br/>• Error Rate below 0.5%<br/>• Latency p95 below 200ms"]
+        Step2["2. Datadog SLA<br/>• Error Rate < 0.5%<br/>• Latency p95 < 200ms"]
         Step3["3. Promote Canary<br/>(Set Weight to 50%)"]
         Step4["4. Full Production<br/>Promotion (100%)"]
         Abort["🚨 Auto-Rollback<br/>to Stable Version"]
     end
 
-    subgraph RoutingLayer["2. OpenShift Ingress & Routing"]
+    subgraph RoutingLayer["2. Ingress & Routing"]
         direction TB
         CanaryService["Canary Service Pods<br/>(20% Test Traffic)"]
         StableService["Stable Service Pods<br/>(80% Live Traffic)"]
@@ -874,23 +873,26 @@ flowchart TB
 ```mermaid
 flowchart LR
     subgraph PipelineSpan["1. Jenkins CI Span"]
-        JTrace["Datadog CI Visibility<br/>Trace ID: 7492...048"]
+        direction TB
+        JTrace["Datadog CI Visibility<br/>Trace: 7492...048"]
         JBuild["mvn package bw6 EAR"]
-        JSign["cosign sign & syft sbom"]
+        JSign["cosign sign & syft"]
     end
 
-    subgraph GitOpsSpan["2. GitOps & ArgoCD Span"]
-        GCommit["git commit (Trace ID)"]
-        ASync["ArgoCD Sync & Health Check"]
+    subgraph GitOpsSpan["2. GitOps Span"]
+        direction TB
+        GCommit["git commit (trace)"]
+        ASync["ArgoCD Sync Check"]
     end
 
-    subgraph AppRuntimeSpan["3. TIBCO BWCE Runtime Span"]
-        AppStart["JVM Startup (dd-java-agent.jar)"]
-        HTTPReq["REST Activity /orders & APM"]
+    subgraph AppRuntimeSpan["3. BWCE Runtime Span"]
+        direction TB
+        AppStart["JVM Startup (dd-agent)"]
+        HTTPReq["REST /orders & APM"]
     end
 
-    subgraph UnifiedDatadog["4. Datadog Live Dashboard"]
-        DDDash["Datadog Unified APM Dashboard<br/>Traces → Logs → Metrics"]
+    subgraph UnifiedDatadog["4. Datadog Dashboard"]
+        DDDash["Datadog APM Dashboard<br/>Traces & Metrics"]
     end
 
     JTrace --> JBuild --> JSign
