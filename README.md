@@ -75,6 +75,7 @@
   - [2. The Root Cause of Jenkins SCM Friction in BWCE Builds](#2-the-root-cause-of-jenkins-scm-friction-in-bwce-builds)
   - [3. How Git & ArgoCD Solve BWCE Parameterization Natively](#3-how-git--argocd-solve-bwce-parameterization-natively)
   - [4. Why There is No 'jenkins-without-git-parameter-bwce-global-vars' Repository](#4-why-there-is-no-jenkins-without-git-parameter-bwce-global-vars-repository)
+  - [5. Decoupled Architecture: Docker Images vs. Environment Variables & Placeholders](#5-decoupled-architecture-docker-images-vs-environment-variables--placeholders)
 - [TIBCO BWCE Cloud-Native Best Practices](#tibco-bwce-cloud-native-best-practices)
   - [1. 12-Factor Profile Externalization via `.substvar`](#1-12-factor-profile-externalization-via-substvar)
   - [2. Engine Sizing & JVM Performance Tuning](#2-engine-sizing--jvm-performance-tuning)
@@ -194,6 +195,76 @@ In `jenkins-without-git-parameter-bwce`:
 1. **Jenkins has no dropdowns**: CI runs 100% automated via webhooks.
 2. **ArgoCD owns the configuration**: Environment definitions and `.substvar` profile mappings live in standard GitOps directories (`config/clusters.yaml`, `sample-apps/gitops-manifests/environments/`, and `argocd-apps/`).
 3. **No Jenkins-Specific Naming**: In pure GitOps, configuration repositories belong to **ArgoCD and Kubernetes**, not Jenkins.
+
+---
+
+### 5. Decoupled Architecture: Docker Images vs. Environment Variables & Placeholders
+
+A core design consideration for enterprise **TIBCO BusinessWorks™ Container Edition (BWCE)** is: **How are BWCE container images decoupled from environment variables, `.substvar` profile placeholders, and secrets?**
+
+#### 1. Lifecycle Decoupling (Artifact vs. Configuration in BWCE)
+
+In Pure GitOps, the executable BWCE container image and environment-specific configurations are cleanly separated at the container boundary:
+* **The BWCE Docker Image is 100% Environment-Agnostic**:
+  - The image contains the compiled BusinessWorks Enterprise Archive (`.ear`) built via `bw6-maven-plugin`, layered onto `tibco/bwce:2.9.2`.
+  - It contains **zero environment endpoints, zero credentials, and zero hardcoded database URLs**.
+  - The exact same container image digest (`sha256:def5678`) promoted from DEV runs unchanged in STAGING and PROD.
+* **Environment Variables & `.substvar` Profiles Live in GitOps Manifests**:
+  - Environment-specific values (`BW_PROFILE: DEV.substvar`, `STAGING.substvar`, `PROD.substvar`, Vault secret placeholders) live declaratively in Kustomize overlays (`sample-apps/tibco-bwce-order-service/k8s/overlays/{dev,staging,prod}/patch-env.yaml`).
+  - At pod startup, Kubernetes/OpenShift injects the `BW_PROFILE` variable and ConfigMaps/Secrets reconciled by ArgoCD.
+
+<details>
+<summary>📦 <b>Click to expand: TIBCO BWCE Docker Image vs. .substvar Decoupling Lifecycle Diagram</b></summary>
+<br/>
+
+```mermaid
+flowchart LR
+    subgraph BuildTime["1. CI Build Time (Immutable BWCE Image)"]
+        direction TB
+        Code["📦 BWCE Studio Project<br/>(bw6-maven-plugin)"] --> Build["🏗️ Lean Jenkins CI"]
+        Build --> Image["🐳 Immutable BWCE Image<br/>(tibco/bwce:2.9.2 + EAR)<br/>• ZERO environment endpoints<br/>• ZERO hardcoded secrets"]
+        Image --> Registry["OpenShift Registry"]
+    end
+
+    subgraph Runtime["2. CD GitOps Runtime (Configuration)"]
+        direction TB
+        Overlays["📁 GitOps Environment Manifests<br/>• BW_PROFILE: DEV.substvar<br/>• BW_PROFILE: PROD.substvar<br/>• ConfigMaps / Vault Secrets"]
+        ArgoCD["🐙 ArgoCD 3.5 Controller"]
+        Cluster["☸️ Target OpenShift Cluster"]
+        
+        Overlays --> ArgoCD
+        ArgoCD -->|"Injects Profile at Startup"| Cluster
+    end
+
+    Registry -.->|"Pulls Image by Digest"| Cluster
+```
+
+</details>
+
+#### 2. Why This Repository Uses a Unified Platform Monorepo
+
+Rather than fragmenting into 3 separate Git repositories (`bwce-app-repo`, `ci-platform-repo`, and `global-vars-repo`), this project organizes them in a cohesive, self-contained **Platform Blueprint**:
+
+1. **1-Click Reproducibility & Portability**:
+   Platform engineers can clone a single repository and execute `./deploy.sh` or `make deploy` to provision Jenkins JCasC, ArgoCD 3.5, ApplicationSets, Datadog APM, and sample BWCE microservices with zero broken links.
+2. **Elimination of Jenkins Cross-Repo Parameter Coordination**:
+   In the legacy push model, separate repositories were needed because Jenkins had a manual UI form requiring developers to pick combinations of `(BWCE_App_Tag, Substvar_Tag)`. In Pure GitOps, Jenkins does not coordinate parameters—it is event-driven via webhooks.
+3. **Atomic Versioning & Traceability**:
+   Every commit represents a verified snapshot where Jenkins BWCE builder pod templates (`jcasc/`), pipeline steps (`jenkinsfiles/`), ArgoCD ApplicationSets (`argocd-apps/`), and workload overlays (`sample-apps/`) are guaranteed to be mutually compatible.
+4. **Prevention of Orphaned Remote Dependencies**:
+   Avoids dependency on external standalone repos that might experience breaking changes, access revocations, or deletion.
+
+#### 3. Platform Monorepo Blueprint vs. Enterprise Polyrepo GitOps Matrix
+
+| Architectural Dimension | Platform Monorepo (This Blueprint) | Enterprise Polyrepo GitOps |
+| :--- | :--- | :--- |
+| **Repository Topology** | **1 Cohesive Repository** containing IaC, CI, GitOps manifests, and BWCE sample apps. | **2 to 3 Repositories** (`bwce-app`, `ci-platform`, `central-gitops-manifests`). |
+| **Target Audience** | Reference architectures, blueprints, platform teams, PoCs, and fast onboarding. | Large enterprises with strict organization boundaries (Integration Teams vs. Platform Ops). |
+| **Docker Image Decoupling** | **Fully Decoupled**: Image is built environment-agnostic; overlays inject `BW_PROFILE`. | **Fully Decoupled**: Image is built environment-agnostic; overlays inject `BW_PROFILE`. |
+| **Jenkins CI Role** | **Parameterless Multibranch CI**: Builds EAR, scans, signs, and commits tag to local GitOps folder. | **Parameterless Multibranch CI**: Builds EAR, scans, signs, and opens a PR to central GitOps repo. |
+| **Jenkins UI Parameters** | **Zero Parameters** (Pure webhook / event-driven). | **Zero Parameters** (Pure webhook / event-driven). |
+| **ArgoCD GitOps Role** | Reconciles manifests directly from `sample-apps/gitops-manifests/` or overlays. | Reconciles manifests directly from the central `gitops-manifests` repository. |
+| **Rollback & Auditability** | Instant `git revert` or ArgoCD 1-click revision rollback. | Instant `git revert` in the GitOps repo or ArgoCD 1-click revision rollback. |
 
 ---
 
