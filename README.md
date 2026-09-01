@@ -153,7 +153,6 @@ For enterprise integration platforms hosting **TIBCO BusinessWorks™ Container 
 
 <details>
 <summary>🔄 <b>Click to expand: Three-Way Architectural Evolution Diagram (Pattern 1 vs. Pattern 2 vs. Pure GitOps for BWCE)</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -286,7 +285,6 @@ In Pure GitOps, the executable BWCE container image and environment-specific con
 
 <details>
 <summary>📦 <b>Click to expand: TIBCO BWCE Docker Image vs. .substvar Decoupling Lifecycle Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart LR
@@ -351,7 +349,6 @@ In **Pure GitOps (`jenkins-without-git-parameter`)**, Backstage and ServiceNow i
 
 <details>
 <summary>🔄 <b>Click to expand: Side-by-Side ITSM & Backstage Architectural Flow (Push vs. Pure GitOps)</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -369,7 +366,7 @@ flowchart TB
     subgraph PureGitOpsITSM["Pattern B: Pure GitOps ITSM & Backstage Flow (This Repository)"]
         direction TB
         DevB["👩‍💻 Developer /<br/>Release Manager"] -->|"1. Self-Service / Approval"| PortalB["🎭 Backstage / ServiceNow<br/>(Ticket: CHG00123)"]
-        PortalB -->|"2. Creates / Merges PR<br/>[Ref: CHG00123]"| GitB["🐙 GitOps Repo (SSOT)<br/>(Protected prod branch)"]
+        PortalB -->|"2. Creates / Merges PR<br/>(Ref: CHG00123)"| GitB["🐙 GitOps Repo (SSOT)<br/>(Protected prod branch)"]
         GitB -->|"3. Continuous Reconcile"| ArgoB["🐙 ArgoCD 3.5 Controller<br/>(AppSets & Rollouts)"]
         ArgoB -->|"4. Progressive Sync"| K8sB["☸️ OpenShift PROD"]
         
@@ -386,7 +383,6 @@ flowchart TB
 
 <details>
 <summary>⚡ <b>Click to expand: ServiceNow / Jira ITSM Automated Change Approval & Reconciliation Sequence Diagram</b></summary>
-<br/>
 
 ```mermaid
 sequenceDiagram
@@ -497,7 +493,6 @@ ightarrow$ 100%) and queries Datadog metrics via an `AnalysisTemplate`. If the H
 
 <details>
 <summary>🔄 <b>Click to expand: Parameter Flow Comparison Diagram (Jenkins Proxy vs. Pure GitOps)</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -535,7 +530,6 @@ flowchart TB
 
 <details>
 <summary>🌐 <b>Click to expand: Legacy Global-Vars vs. Pure GitOps Repository Topology Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -574,7 +568,6 @@ flowchart TB
 
 <details>
 <summary>🗺️ <b>Click to expand: End-to-End Multi-Cluster Platform Topology Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -661,7 +654,6 @@ flowchart TB
 
 <details>
 <summary>⚠️ <b>Click to expand: Jenkins SCM Pre-Execution Lifecycle Blindspot Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -697,7 +689,6 @@ flowchart TB
 
 <details>
 <summary>🔄 <b>Click to expand: Side-by-Side Architectural Flow (Push vs. Pull)</b></summary>
-<br/>
 
 ```mermaid
 flowchart LR
@@ -728,7 +719,6 @@ flowchart LR
 
 <details>
 <summary>⚡ <b>Click to expand: Dynamic Ephemeral PR Preview Environments Sequence Diagram</b></summary>
-<br/>
 
 ```mermaid
 sequenceDiagram
@@ -766,7 +756,6 @@ sequenceDiagram
 
 <details>
 <summary>🚀 <b>Click to expand: Automated BWCE CI -> GitOps Promotion Sequence Diagram</b></summary>
-<br/>
 
 ```mermaid
 sequenceDiagram
@@ -806,7 +795,6 @@ sequenceDiagram
 
 <details>
 <summary>⚙️ <b>Click to expand: ArgoCD Multi-Cluster Matrix Reconciliation Engine Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -818,7 +806,7 @@ flowchart TB
 
     subgraph AppSetEngine["2. ApplicationSet Matrix Generator"]
         direction TB
-        Matrix["⚙️ Matrix Engine:<br/>Combines [Clusters]<br/>x [Overlays]"]
+        Matrix["⚙️ Matrix Engine:<br/>Combines Clusters<br/>x Overlays"]
         AppDev["Application: bwce-dev<br/>• targetRevision: main<br/>• profile: DEV.substvar"]
         AppStg["Application: bwce-staging<br/>• targetRevision: staging<br/>• profile: STAGING.substvar"]
         AppPrd["Application: bwce-prod<br/>• targetRevision: prod<br/>• profile: PROD.substvar"]
@@ -846,7 +834,6 @@ flowchart TB
 
 <details>
 <summary>🛡️ <b>Click to expand: Zero-Trust Security & RBAC Boundary Architecture Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -892,7 +879,6 @@ flowchart TB
 
 <details>
 <summary>📊 <b>Click to expand: Progressive Delivery & Datadog SLA Analysis Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart TB
@@ -927,7 +913,6 @@ flowchart TB
 
 <details>
 <summary>🔭 <b>Click to expand: Full-Stack Observability & Datadog Trace Propagation Diagram</b></summary>
-<br/>
 
 ```mermaid
 flowchart LR
@@ -938,7 +923,7 @@ flowchart LR
     end
 
     subgraph GitOpsSpan["2. GitOps & ArgoCD Span"]
-        GCommit["git commit [Trace ID]"]
+        GCommit["git commit (Trace ID)"]
         ASync["ArgoCD Sync & Health Check"]
     end
 
