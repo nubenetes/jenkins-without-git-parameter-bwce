@@ -151,7 +151,7 @@ For enterprise integration platforms hosting **TIBCO BusinessWorks™ Container 
 > * **Pipeline 01 becomes a parameterless, webhook-driven CI engine**: Developers never interact with Jenkins UI dropdowns; pushing code or opening PRs automatically compiles the EAR, scans (Trivy), generates SBOM (Syft), signs (Cosign SLSA 3), and commits the image tag to GitOps.
 > * **Release selection is native to Git & ArgoCD**: Handled via Git PRs, Semantic Version tags (`v1.2.0`), or ArgoCD's native `targetRevision` UI/CLI with 12-Factor `.substvar` profiles managed declaratively in Kustomize overlays.
 
-<details>
+<details open>
 <summary>🔄 <b>Click to expand: Three-Way Architectural Evolution Diagram (Pattern 1 vs. Pattern 2 vs. Pure GitOps for BWCE)</b></summary>
 
 ```mermaid
@@ -283,7 +283,7 @@ In Pure GitOps, the executable BWCE container image and environment-specific con
   - Environment-specific values (`BW_PROFILE: DEV.substvar`, `STAGING.substvar`, `PROD.substvar`, Vault secret placeholders) live declaratively in Kustomize overlays (`sample-apps/tibco-bwce-order-service/k8s/overlays/{dev,staging,prod}/patch-env.yaml`).
   - At pod startup, Kubernetes/OpenShift injects the `BW_PROFILE` variable and ConfigMaps/Secrets reconciled by ArgoCD.
 
-<details>
+<details open>
 <summary>📦 <b>Click to expand: TIBCO BWCE Docker Image vs. .substvar Decoupling Lifecycle Diagram</b></summary>
 
 ```mermaid
@@ -347,7 +347,7 @@ In the legacy push architecture ([`jenkins-git-parameter`](https://github.com/nu
 
 In **Pure GitOps (`jenkins-without-git-parameter`)**, Backstage and ServiceNow interact directly with **Git (the Single Source of Truth)** and **ArgoCD 3.5**, while **ArgoCD Notifications** automatically updates tickets and developer catalogs:
 
-<details>
+<details open>
 <summary>🔄 <b>Click to expand: Side-by-Side ITSM & Backstage Architectural Flow (Push vs. Pure GitOps)</b></summary>
 
 ```mermaid
@@ -381,7 +381,7 @@ flowchart TB
 
 #### 2. Enterprise Sequence Workflow: ServiceNow / Jira ITSM & ArgoCD
 
-<details>
+<details open>
 <summary>⚡ <b>Click to expand: ServiceNow / Jira ITSM Automated Change Approval & Reconciliation Sequence Diagram</b></summary>
 
 ```mermaid
@@ -491,7 +491,7 @@ ightarrow$ 100%) and queries Datadog metrics via an `AnalysisTemplate`. If the H
 
 ### 1. Parameter Flow Comparison (Jenkins Proxy vs. Pure GitOps)
 
-<details>
+<details open>
 <summary>🔄 <b>Click to expand: Parameter Flow Comparison Diagram (Jenkins Proxy vs. Pure GitOps)</b></summary>
 
 ```mermaid
@@ -511,7 +511,7 @@ flowchart TB
         direction TB
         Dev2["👩‍💻 Developer"] -->|"1. Git PR / Release Tag"| Git2["🐙 Git Repository (SSOT)<br/>(App Code & GitOps)"]
         Git2 -.->|"2. Webhook Event"| JenkinsCI["🏗️ Lean Jenkins CI<br/>(Multibranch Webhook)"]
-        JenkinsCI -->|"3. Build EAR, Scan & Sign"| JenkinsCI
+        JenkinsCI -->|"3. Build EAR & Scan"| Reg2
         JenkinsCI -->|"4. Pushes Signed Image"| Reg2["🐳 Container Registry<br/>(SLSA Level 3)"]
         JenkinsCI -->|"5. Auto-Commits Tag"| GitOps2["🌐 GitOps Manifests<br/>(Overlays & Clusters)"]
         
@@ -528,7 +528,7 @@ flowchart TB
 
 ### 2. Legacy Global-Vars vs. Pure GitOps Repository Topology
 
-<details>
+<details open>
 <summary>🌐 <b>Click to expand: Legacy Global-Vars vs. Pure GitOps Repository Topology Diagram</b></summary>
 
 ```mermaid
@@ -566,7 +566,7 @@ flowchart TB
 
 ### 3. End-to-End Multi-Cluster Platform Topology
 
-<details>
+<details open>
 <summary>🗺️ <b>Click to expand: End-to-End Multi-Cluster Platform Topology Diagram</b></summary>
 
 ```mermaid
@@ -652,7 +652,7 @@ flowchart TB
 
 ### 4. Jenkins SCM Pre-Execution Lifecycle Blindspot
 
-<details>
+<details open>
 <summary>⚠️ <b>Click to expand: Jenkins SCM Pre-Execution Lifecycle Blindspot Diagram</b></summary>
 
 ```mermaid
@@ -687,7 +687,7 @@ flowchart TB
 
 ### 5. Side-by-Side Flow Comparison: Push vs. Pull
 
-<details>
+<details open>
 <summary>🔄 <b>Click to expand: Side-by-Side Architectural Flow (Push vs. Pull)</b></summary>
 
 ```mermaid
@@ -717,7 +717,7 @@ flowchart LR
 
 ### 6. Dynamic Ephemeral Pull Request (PR) Preview Environments for BWCE
 
-<details>
+<details open>
 <summary>⚡ <b>Click to expand: Dynamic Ephemeral PR Preview Environments Sequence Diagram</b></summary>
 
 ```mermaid
@@ -754,7 +754,7 @@ sequenceDiagram
 
 ### 7. Automated BWCE CI -> GitOps Promotion Sequence
 
-<details>
+<details open>
 <summary>🚀 <b>Click to expand: Automated BWCE CI -> GitOps Promotion Sequence Diagram</b></summary>
 
 ```mermaid
@@ -793,7 +793,7 @@ sequenceDiagram
 
 ### 8. ArgoCD Multi-Cluster Matrix Reconciliation Engine for BWCE
 
-<details>
+<details open>
 <summary>⚙️ <b>Click to expand: ArgoCD Multi-Cluster Matrix Reconciliation Engine Diagram</b></summary>
 
 ```mermaid
@@ -832,7 +832,7 @@ flowchart TB
 
 ### 9. Zero-Trust Security & RBAC Boundary Architecture
 
-<details>
+<details open>
 <summary>🛡️ <b>Click to expand: Zero-Trust Security & RBAC Boundary Architecture Diagram</b></summary>
 
 ```mermaid
@@ -877,7 +877,7 @@ flowchart TB
 
 ### 10. Progressive Delivery with Argo Rollouts & Datadog SLA
 
-<details>
+<details open>
 <summary>📊 <b>Click to expand: Progressive Delivery & Datadog SLA Analysis Diagram</b></summary>
 
 ```mermaid
@@ -911,7 +911,7 @@ flowchart TB
 
 ### 11. Full-Stack Observability & Trace Context Propagation with Datadog
 
-<details>
+<details open>
 <summary>🔭 <b>Click to expand: Full-Stack Observability & Datadog Trace Propagation Diagram</b></summary>
 
 ```mermaid
