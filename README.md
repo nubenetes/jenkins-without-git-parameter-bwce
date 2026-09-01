@@ -62,7 +62,7 @@
 > This platform implements the **Pure GitOps (Pull-based) Architecture for TIBCO BWCE microservices**, serving as the modern cloud-native alternative to the push-based [`nubenetes/jenkins-git-parameter-bwce`](https://github.com/nubenetes/jenkins-git-parameter-bwce) pattern:
 > * 🚀 **Pure GitOps Platform Orchestrator (This Repository)**: [**`nubenetes/jenkins-without-git-parameter-bwce`**](https://github.com/nubenetes/jenkins-without-git-parameter-bwce) — Infrastructure-as-Code, Lean Jenkins JCasC CI, ArgoCD 3.5 ApplicationSets, Native TargetRevision Selection, and Datadog APM Observability.
 > * 🌐 **Reference Push-Based Repository**: [**`nubenetes/jenkins-git-parameter-bwce`**](https://github.com/nubenetes/jenkins-git-parameter-bwce) — Legacy/Push model with Jenkins UI `gitParameter` dropdowns and multi-remote SCM Job DSL.
-> * 📦 **Workload Reference Microservice**: [**`nubenetes/tibco-bwce-order-service`**](https://github.com/nubenetes/tibco-bwce-order-service) — TIBCO BusinessWorks™ Container Edition cloud-native microservice with 12-Factor `.substvar` profile externalization and Datadog APM integration.
+> * 📦 **Embedded Workload Microservices**: Located directly within [`sample-apps/tibco-bwce-order-service`](sample-apps/tibco-bwce-order-service) and [`sample-apps/tibco-bwce-customer-api`](sample-apps/tibco-bwce-customer-api) — TIBCO BusinessWorks™ Container Edition cloud-native microservices with 12-Factor `.substvar` profile externalization and Datadog APM integration.
 
 ---
 
@@ -488,7 +488,7 @@ flowchart LR
 sequenceDiagram
     autonumber
     actor Dev as 👩‍💻 Developer
-    participant GitHub as 🐙 GitHub (tibco-bwce-order-service)
+    participant GitHub as 🐙 GitHub (sample-apps/bwce)
     participant Jenkins as 🏗️ Jenkins Multibranch CI
     participant Registry as 🐳 OpenShift Registry
     participant ArgoCD as 🐙 ArgoCD ApplicationSet Controller

@@ -4,7 +4,7 @@ inventory:
     type: backend-integration
     framework: tibco-bwce-2.9.2
     runtime: tibco-bwce-ubi9
-    repo: https://github.com/nubenetes/tibco-bwce-order-service.git
+    repo: https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git
     owner: integration-platform-team
     monitoring: datadog-apm
   - id: tibco-bwce-customer-api
@@ -12,6 +12,6 @@ inventory:
     type: api-gateway
     framework: tibco-bwce-2.9.2
     runtime: tibco-bwce-ubi9
-    repo: https://github.com/nubenetes/tibco-bwce-customer-api.git
+    repo: https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git
     owner: api-management-team
     monitoring: datadog-apm

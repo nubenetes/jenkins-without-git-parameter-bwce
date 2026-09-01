@@ -6,13 +6,13 @@ def apps = [
     [
         name: 'tibco-bwce-order-service',
         description: 'TIBCO BWCE Order Service Cloud-Native Microservice',
-        repoUrl: 'https://github.com/nubenetes/tibco-bwce-order-service.git',
+        repoUrl: 'https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git',
         jenkinsfile: 'jenkinsfiles/ci/Jenkinsfile.app-bwce'
     ],
     [
         name: 'tibco-bwce-customer-api',
         description: 'TIBCO BWCE Customer API Cloud-Native Microservice',
-        repoUrl: 'https://github.com/nubenetes/tibco-bwce-customer-api.git',
+        repoUrl: 'https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git',
         jenkinsfile: 'jenkinsfiles/ci/Jenkinsfile.app-bwce'
     ]
 ]
