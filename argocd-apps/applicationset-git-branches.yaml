@@ -1,0 +1,34 @@
+# ==============================================================================
+# ArgoCD ApplicationSet: Git Branch & Tag Generator for TIBCO BWCE
+# ==============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: release-branch-bwce-generator
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git
+        revision: main
+        directories:
+          - path: sample-apps/tibco-bwce-order-service/k8s/overlays/*
+  template:
+    metadata:
+      name: "bwce-branch-tracker-{{path.basename}}"
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git
+        targetRevision: "{{path.basename}}"
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "nubenetes-{{path.basename}}-bwce"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

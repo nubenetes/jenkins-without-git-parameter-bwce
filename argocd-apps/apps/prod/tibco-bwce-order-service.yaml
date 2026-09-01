@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tibco-bwce-order-service-prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: tibco-bwce-order-service
+    environment: prod
+    pattern: pure-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git'
+    targetRevision: prod
+    path: sample-apps/tibco-bwce-order-service/k8s/overlays/prod
+  destination:
+    name: ocp-prod-cluster
+    namespace: nubenetes-prod-bwce
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

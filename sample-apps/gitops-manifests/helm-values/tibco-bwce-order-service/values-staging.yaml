@@ -1,0 +1,70 @@
+# ==============================================================================
+# Helm Values: tibco-bwce-order-service (STAGING)
+# ==============================================================================
+replicaCount: 3
+
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/nubenetes-staging-bwce/tibco-bwce-order-service
+  tag: "2.1.0-42-a1b2c3d"
+  pullPolicy: IfNotPresent
+
+podAnnotations:
+  ad.datadoghq.com/tibco-bwce-order-service.logs: '[{"source": "tibco-bwce", "service": "tibco-bwce-order-service"}]'
+  ad.datadoghq.com/tibco-bwce-order-service.check_names: '["openmetrics"]'
+  ad.datadoghq.com/tibco-bwce-order-service.init_configs: '[{}]'
+  ad.datadoghq.com/tibco-bwce-order-service.instances: |
+    [
+      {
+        "openmetrics_endpoint": "http://%%host%%:8090/metrics",
+        "namespace": "tibco_bwce",
+        "metrics": [".*"]
+      }
+    ]
+
+podLabels:
+  tags.datadoghq.com/env: "staging"
+  tags.datadoghq.com/service: "tibco-bwce-order-service"
+  tags.datadoghq.com/version: "2.1.0-42-a1b2c3d"
+
+env:
+  - name: BW_PROFILE
+    value: "STAGING.substvar"
+  - name: BW_LOGLEVEL
+    value: "INFO"
+  - name: BW_ENGINE_THREADCOUNT
+    value: "32"
+  - name: BW_STEP_FLOWLIMIT
+    value: "100"
+  - name: BW_CONTAINER_SHUTDOWN_TIMEOUT_SECONDS
+    value: "30"
+  - name: DD_ENV
+    value: "staging"
+  - name: DD_SERVICE
+    value: "tibco-bwce-order-service"
+  - name: DD_VERSION
+    value: "2.1.0-42-a1b2c3d"
+  - name: DD_AGENT_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+  - name: BW_JAVA_OPTS
+    value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -javaagent:/opt/datadog/dd-java-agent.jar -Ddd.logs.injection=true"
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 768Mi
+  limits:
+    # CPU limit omitted to prevent Linux CFS throttling; governed at project level via ResourceQuota
+    memory: 1536Mi
+
+service:
+  type: ClusterIP
+  port: 8080
+  managementPort: 8090
+
+route:
+  enabled: true
+  host: tibco-bwce-order-service-staging.apps.ocp-staging.nubenetes.internal
+  tls:
+    termination: edge

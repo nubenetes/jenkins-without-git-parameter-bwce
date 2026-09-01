@@ -1,0 +1,81 @@
+# ==============================================================================
+# Helm Values: tibco-bwce-order-service (DEV)
+# ==============================================================================
+replicaCount: 2
+
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/nubenetes-dev-bwce/tibco-bwce-order-service
+  tag: "2.1.0-42-a1b2c3d"
+  pullPolicy: IfNotPresent
+
+podAnnotations:
+  ad.datadoghq.com/tibco-bwce-order-service.logs: '[{"source": "tibco-bwce", "service": "tibco-bwce-order-service"}]'
+  ad.datadoghq.com/tibco-bwce-order-service.check_names: '["openmetrics"]'
+  ad.datadoghq.com/tibco-bwce-order-service.init_configs: '[{}]'
+  ad.datadoghq.com/tibco-bwce-order-service.instances: |
+    [
+      {
+        "openmetrics_endpoint": "http://%%host%%:8090/metrics",
+        "namespace": "tibco_bwce",
+        "metrics": [".*"]
+      }
+    ]
+
+podLabels:
+  tags.datadoghq.com/env: "dev"
+  tags.datadoghq.com/service: "tibco-bwce-order-service"
+  tags.datadoghq.com/version: "2.1.0-42-a1b2c3d"
+
+env:
+  - name: BW_PROFILE
+    value: "DEV.substvar"
+  - name: BW_LOGLEVEL
+    value: "DEBUG"
+  - name: BW_ENGINE_THREADCOUNT
+    value: "16"
+  - name: BW_STEP_FLOWLIMIT
+    value: "50"
+  - name: BW_CONTAINER_SHUTDOWN_TIMEOUT_SECONDS
+    value: "30"
+  - name: DD_ENV
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.labels['tags.datadoghq.com/env']
+  - name: DD_SERVICE
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.labels['tags.datadoghq.com/service']
+  - name: DD_VERSION
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.labels['tags.datadoghq.com/version']
+  - name: DD_AGENT_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+  - name: DD_TRACE_AGENT_PORT
+    value: "8126"
+  - name: DD_DOGSTATSD_PORT
+    value: "8125"
+  - name: BW_JAVA_OPTS
+    value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -javaagent:/opt/datadog/dd-java-agent.jar -Ddd.logs.injection=true -Ddd.profiling.enabled=true"
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    # CPU limit omitted to prevent Linux CFS throttling; governed at project level via ResourceQuota
+    memory: 1024Mi
+
+service:
+  type: ClusterIP
+  port: 8080
+  managementPort: 8090
+
+route:
+  enabled: true
+  host: tibco-bwce-order-service-dev.apps.ocp-dev.nubenetes.internal
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

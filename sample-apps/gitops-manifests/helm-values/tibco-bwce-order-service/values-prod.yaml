@@ -1,0 +1,70 @@
+# ==============================================================================
+# Helm Values: tibco-bwce-order-service (PROD)
+# ==============================================================================
+replicaCount: 6
+
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/nubenetes-prod-bwce/tibco-bwce-order-service
+  tag: "2.0.8-39-e9f8a7b"
+  pullPolicy: IfNotPresent
+
+podAnnotations:
+  ad.datadoghq.com/tibco-bwce-order-service.logs: '[{"source": "tibco-bwce", "service": "tibco-bwce-order-service"}]'
+  ad.datadoghq.com/tibco-bwce-order-service.check_names: '["openmetrics"]'
+  ad.datadoghq.com/tibco-bwce-order-service.init_configs: '[{}]'
+  ad.datadoghq.com/tibco-bwce-order-service.instances: |
+    [
+      {
+        "openmetrics_endpoint": "http://%%host%%:8090/metrics",
+        "namespace": "tibco_bwce",
+        "metrics": [".*"]
+      }
+    ]
+
+podLabels:
+  tags.datadoghq.com/env: "prod"
+  tags.datadoghq.com/service: "tibco-bwce-order-service"
+  tags.datadoghq.com/version: "2.0.8-39-e9f8a7b"
+
+env:
+  - name: BW_PROFILE
+    value: "PROD.substvar"
+  - name: BW_LOGLEVEL
+    value: "WARN"
+  - name: BW_ENGINE_THREADCOUNT
+    value: "64"
+  - name: BW_STEP_FLOWLIMIT
+    value: "250"
+  - name: BW_CONTAINER_SHUTDOWN_TIMEOUT_SECONDS
+    value: "45"
+  - name: DD_ENV
+    value: "prod"
+  - name: DD_SERVICE
+    value: "tibco-bwce-order-service"
+  - name: DD_VERSION
+    value: "2.0.8-39-e9f8a7b"
+  - name: DD_AGENT_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+  - name: BW_JAVA_OPTS
+    value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -javaagent:/opt/datadog/dd-java-agent.jar -Ddd.logs.injection=true"
+
+resources:
+  requests:
+    cpu: 1000m
+    memory: 1024Mi
+  limits:
+    # CPU limit omitted to prevent Linux CFS throttling; governed at project level via ResourceQuota
+    memory: 2048Mi
+
+service:
+  type: ClusterIP
+  port: 8080
+  managementPort: 8090
+
+route:
+  enabled: true
+  host: tibco-bwce-order-service.apps.ocp-prod.nubenetes.internal
+  tls:
+    termination: edge

@@ -1,0 +1,44 @@
+# ==============================================================================
+# ArgoCD ApplicationSet: Dynamic Ephemeral PR Preview for TIBCO BWCE
+# ==============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ephemeral-pr-preview-bwce
+  namespace: argocd
+spec:
+  generators:
+    - pullRequest:
+        github:
+          owner: nubenetes
+          repo: tibco-bwce-order-service
+          labels:
+            - preview-environment
+          tokenRef:
+            secretName: github-token-secret
+            key: token
+        requeueAfterSeconds: 60
+  template:
+    metadata:
+      name: "preview-pr-{{number}}-bwce"
+      namespace: argocd
+      labels:
+        environment: preview
+        pr-number: "{{number}}"
+        branch: "{{branch}}"
+        workload-type: tibco-bwce
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/nubenetes/tibco-bwce-order-service.git
+        targetRevision: "{{head_sha}}"
+        path: k8s/overlays/dev
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "pr-preview-{{number}}-bwce"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

@@ -1,0 +1,17 @@
+inventory:
+  - id: tibco-bwce-order-service
+    name: "TIBCO BWCE Order Processing Microservice"
+    type: backend-integration
+    framework: tibco-bwce-2.9.2
+    runtime: tibco-bwce-ubi9
+    repo: https://github.com/nubenetes/tibco-bwce-order-service.git
+    owner: integration-platform-team
+    monitoring: datadog-apm
+  - id: tibco-bwce-customer-api
+    name: "TIBCO BWCE Customer API Gateway"
+    type: api-gateway
+    framework: tibco-bwce-2.9.2
+    runtime: tibco-bwce-ubi9
+    repo: https://github.com/nubenetes/tibco-bwce-customer-api.git
+    owner: api-management-team
+    monitoring: datadog-apm

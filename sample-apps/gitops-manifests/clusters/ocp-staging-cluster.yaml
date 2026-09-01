@@ -1,0 +1,27 @@
+# ==============================================================================
+# Cluster Specification: OCP STAGING Cluster
+# ==============================================================================
+apiVersion: infrastructure.nubenetes.io/v1alpha1
+kind: OpenShiftCluster
+metadata:
+  name: ocp-staging
+spec:
+  apiEndpoint: "https://api.ocp-staging.nubenetes.internal:6443"
+  appsDomain: "apps.ocp-staging.nubenetes.internal"
+  region: "eu-west-1"
+  zone: "staging-az2"
+  environment: "staging"
+  sccRestrictedV2: true
+  registries:
+    internal: "image-registry.openshift-image-registry.svc:5000"
+    external: "default-route-openshift-image-registry.apps.ocp-staging.nubenetes.internal"
+    namespacePrefix: "nubenetes-staging-bwce"
+  argocd:
+    serverName: "ocp-staging-cluster"
+    syncPolicy: "Automated"
+    prune: true
+    selfHeal: true
+  datadog:
+    clusterAgentEnabled: true
+    clusterName: "ocp-staging"
+    site: "datadoghq.eu"

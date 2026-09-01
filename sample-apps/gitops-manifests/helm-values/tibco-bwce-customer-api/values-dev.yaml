@@ -1,0 +1,23 @@
+# ==============================================================================
+# Helm Values: tibco-bwce-customer-api (DEV)
+# ==============================================================================
+replicaCount: 2
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/nubenetes-dev-bwce/tibco-bwce-customer-api
+  tag: "1.4.0-18-d4e5f6a"
+env:
+  - name: BW_PROFILE
+    value: "DEV.substvar"
+  - name: BW_LOGLEVEL
+    value: "DEBUG"
+  - name: DD_ENV
+    value: "dev"
+  - name: DD_SERVICE
+    value: "tibco-bwce-customer-api"
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    # CPU limit omitted to prevent Linux CFS throttling; governed at project level via ResourceQuota
+    memory: 1024Mi

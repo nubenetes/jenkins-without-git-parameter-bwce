@@ -1,0 +1,58 @@
+# ==============================================================================
+# Global Variables: DEV Environment (TIBCO BWCE & Datadog)
+# ==============================================================================
+environment: dev
+clusterName: ocp-dev
+domain: apps.ocp-dev.nubenetes.internal
+dnsZone: dev.nubenetes.internal
+targetNamespace: nubenetes-dev-bwce
+
+applications:
+  tibco-bwce-order-service:
+    version: "2.1.0-42-a1b2c3d"
+    replicas: 2
+    memoryLimit: "1024Mi"
+    cpuLimit: "1000m"
+    memoryRequest: "512Mi"
+    cpuRequest: "250m"
+    bwceProfile: "DEV.substvar"
+    engineThreadPoolSize: 16
+    stepFlowLimit: 50
+    logLevel: "DEBUG"
+  tibco-bwce-customer-api:
+    version: "1.4.0-18-d4e5f6a"
+    replicas: 2
+    memoryLimit: "1024Mi"
+    cpuLimit: "1000m"
+    memoryRequest: "512Mi"
+    cpuRequest: "250m"
+    bwceProfile: "DEV.substvar"
+    engineThreadPoolSize: 16
+    stepFlowLimit: 50
+    logLevel: "DEBUG"
+
+datadog:
+  env: dev
+  agentHost: datadog-agent.observability.svc.cluster.local
+  dogstatsdPort: 8125
+  traceAgentPort: 8126
+  tracingSampleRate: "1.0"
+  profilingEnabled: true
+  logsInjection: true
+
+database:
+  host: postgresql-dev.nubenetes-dev-bwce.svc.cluster.local
+  port: 5432
+  poolSize: 10
+  sslMode: prefer
+
+jms:
+  emsUrl: "tcp://ems-dev.nubenetes-dev-bwce.svc.cluster.local:7222"
+  connectionPool: 8
+
+resourceQuota:
+  hard:
+    requests.cpu: "16"
+    requests.memory: "32Gi"
+    limits.memory: "64Gi"
+    pods: "50"

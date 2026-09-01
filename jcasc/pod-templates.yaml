@@ -1,0 +1,68 @@
+# ==============================================================================
+# Ephemeral Kubernetes Agent Pod Templates (OpenShift 4.20+ Hardened for TIBCO BWCE)
+# ==============================================================================
+jenkins:
+  clouds:
+    - kubernetes:
+        name: "openshift-cluster"
+        serverUrl: "https://kubernetes.default.svc"
+        namespace: "jenkins"
+        jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+        jenkinsTunnel: "jenkins-agent.jenkins.svc.cluster.local:50000"
+        containerCapStr: "50"
+        retentionTimeout: 10
+        connectTimeout: 100
+        templates:
+          # Pod Template: TIBCO BWCE EAR Builder & Maven Plug-in
+          - name: "bwce-builder"
+            label: "bwce-builder"
+            serviceAccount: "jenkins"
+            nodeUsageMode: "EXCLUSIVE"
+            workspaceVolume:
+              emptyDirWorkspaceVolume:
+                memory: false
+            containers:
+              - name: "jnlp"
+                image: "jenkins/inbound-agent:3283.v92c105e0f819-1-jdk21"
+                privileged: false
+                alwaysPullImage: false
+                workingDir: "/home/jenkins/agent"
+                resourceRequestCpu: "200m"
+                resourceLimitCpu: "500m"
+                resourceRequestMemory: "256Mi"
+                resourceLimitMemory: "512Mi"
+              - name: "maven-bwce"
+                image: "maven:3.9.9-eclipse-temurin-17-alpine"
+                command: "cat"
+                ttyEnabled: true
+                privileged: false
+                workingDir: "/home/jenkins/agent"
+                resourceRequestCpu: "1000m"
+                resourceLimitCpu: "2500m"
+                resourceRequestMemory: "1536Mi"
+                resourceLimitMemory: "3072Mi"
+
+          # Pod Template: Supply Chain Security (Cosign, Syft, Trivy)
+          - name: "security-tools"
+            label: "security-tools"
+            serviceAccount: "jenkins"
+            nodeUsageMode: "EXCLUSIVE"
+            containers:
+              - name: "jnlp"
+                image: "jenkins/inbound-agent:3283.v92c105e0f819-1-jdk21"
+              - name: "cosign-syft"
+                image: "cgr.dev/chainguard/cosign:latest"
+                command: "cat"
+                ttyEnabled: true
+                workingDir: "/home/jenkins/agent"
+                resourceRequestCpu: "200m"
+                resourceLimitCpu: "1000m"
+              - name: "trivy"
+                image: "aquasec/trivy:0.59.1"
+                command: "cat"
+                ttyEnabled: true
+                workingDir: "/home/jenkins/agent"
+                resourceRequestCpu: "500m"
+                resourceLimitCpu: "1000m"
+                resourceRequestMemory: "512Mi"
+                resourceLimitMemory: "1024Mi"

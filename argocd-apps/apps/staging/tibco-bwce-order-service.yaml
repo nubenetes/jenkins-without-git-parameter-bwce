@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tibco-bwce-order-service-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: tibco-bwce-order-service
+    environment: staging
+    pattern: pure-gitops
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git'
+    targetRevision: staging
+    path: sample-apps/tibco-bwce-order-service/k8s/overlays/staging
+  destination:
+    name: ocp-staging-cluster
+    namespace: nubenetes-staging-bwce
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

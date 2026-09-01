@@ -1,0 +1,39 @@
+# ==============================================================================
+# OpenShift Multi-Cluster Topologies for TIBCO BWCE GitOps Reconciliation
+# ==============================================================================
+clusters:
+  - name: ocp-dev
+    environment: dev
+    apiServer: https://kubernetes.default.svc
+    stage: development
+    profile: DEV.substvar
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+    targetRevision: main
+
+  - name: ocp-staging
+    environment: staging
+    apiServer: https://api.ocp-staging.nubenetes.internal:6443
+    stage: uat-staging
+    profile: STAGING.substvar
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+    targetRevision: staging
+
+  - name: ocp-prod
+    environment: prod
+    apiServer: https://api.ocp-prod.nubenetes.internal:6443
+    stage: production
+    profile: PROD.substvar
+    syncPolicy:
+      automated:
+        prune: false
+        selfHeal: true
+    targetRevision: prod
+    progressiveDelivery:
+      strategy: canary
+      analysisTemplate: datadog-bwce-error-rate-analysis

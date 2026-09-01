@@ -1,0 +1,58 @@
+# ==============================================================================
+# Global Variables: STAGING Environment (TIBCO BWCE & Datadog)
+# ==============================================================================
+environment: staging
+clusterName: ocp-staging
+domain: apps.ocp-staging.nubenetes.internal
+dnsZone: staging.nubenetes.internal
+targetNamespace: nubenetes-staging-bwce
+
+applications:
+  tibco-bwce-order-service:
+    version: "2.1.0-42-a1b2c3d"
+    replicas: 3
+    memoryLimit: "1536Mi"
+    cpuLimit: "1500m"
+    memoryRequest: "768Mi"
+    cpuRequest: "500m"
+    bwceProfile: "STAGING.substvar"
+    engineThreadPoolSize: 32
+    stepFlowLimit: 100
+    logLevel: "INFO"
+  tibco-bwce-customer-api:
+    version: "1.4.0-18-d4e5f6a"
+    replicas: 3
+    memoryLimit: "1536Mi"
+    cpuLimit: "1500m"
+    memoryRequest: "768Mi"
+    cpuRequest: "500m"
+    bwceProfile: "STAGING.substvar"
+    engineThreadPoolSize: 32
+    stepFlowLimit: 100
+    logLevel: "INFO"
+
+datadog:
+  env: staging
+  agentHost: datadog-agent.observability.svc.cluster.local
+  dogstatsdPort: 8125
+  traceAgentPort: 8126
+  tracingSampleRate: "0.5"
+  profilingEnabled: true
+  logsInjection: true
+
+database:
+  host: postgresql-staging.nubenetes-staging-bwce.svc.cluster.local
+  port: 5432
+  poolSize: 20
+  sslMode: require
+
+jms:
+  emsUrl: "tcp://ems-staging.nubenetes-staging-bwce.svc.cluster.local:7222"
+  connectionPool: 16
+
+resourceQuota:
+  hard:
+    requests.cpu: "32"
+    requests.memory: "64Gi"
+    limits.memory: "128Gi"
+    pods: "50"

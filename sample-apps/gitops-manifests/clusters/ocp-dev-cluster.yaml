@@ -1,0 +1,27 @@
+# ==============================================================================
+# Cluster Specification: OCP DEV Cluster
+# ==============================================================================
+apiVersion: infrastructure.nubenetes.io/v1alpha1
+kind: OpenShiftCluster
+metadata:
+  name: ocp-dev
+spec:
+  apiEndpoint: "https://api.ocp-dev.nubenetes.internal:6443"
+  appsDomain: "apps.ocp-dev.nubenetes.internal"
+  region: "eu-west-1"
+  zone: "dev-az1"
+  environment: "dev"
+  sccRestrictedV2: true
+  registries:
+    internal: "image-registry.openshift-image-registry.svc:5000"
+    external: "default-route-openshift-image-registry.apps.ocp-dev.nubenetes.internal"
+    namespacePrefix: "nubenetes-dev-bwce"
+  argocd:
+    serverName: "in-cluster"
+    syncPolicy: "Automated"
+    prune: true
+    selfHeal: true
+  datadog:
+    clusterAgentEnabled: true
+    clusterName: "ocp-dev"
+    site: "datadoghq.eu"

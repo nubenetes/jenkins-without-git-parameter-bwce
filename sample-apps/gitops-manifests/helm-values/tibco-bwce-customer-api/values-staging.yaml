@@ -1,0 +1,23 @@
+# ==============================================================================
+# Helm Values: tibco-bwce-customer-api (STAGING)
+# ==============================================================================
+replicaCount: 3
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/nubenetes-staging-bwce/tibco-bwce-customer-api
+  tag: "1.4.0-18-d4e5f6a"
+env:
+  - name: BW_PROFILE
+    value: "STAGING.substvar"
+  - name: BW_LOGLEVEL
+    value: "INFO"
+  - name: DD_ENV
+    value: "staging"
+  - name: DD_SERVICE
+    value: "tibco-bwce-customer-api"
+resources:
+  requests:
+    cpu: 500m
+    memory: 768Mi
+  limits:
+    # CPU limit omitted to prevent Linux CFS throttling; governed at project level via ResourceQuota
+    memory: 1536Mi

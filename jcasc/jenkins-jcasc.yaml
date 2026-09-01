@@ -1,0 +1,115 @@
+# ==============================================================================
+# Jenkins Configuration as Code (JCasC) - TIBCO BWCE OpenShift 4.20+ Setup
+# Architecture: Lean CI Engine with ArgoCD 3.5 GitOps Orchestrator (Zero Git-Parameter)
+# ==============================================================================
+jenkins:
+  systemMessage: "🚀 Nubenetes Enterprise Jenkins Controller | TIBCO BWCE Lean CI Engine with Pure GitOps (ArgoCD 3.5 Native Parameterization)"
+  numExecutors: 0
+  mode: EXCLUSIVE
+  scmCheckoutRetryCount: 3
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          name: "OpenShift Platform Admin"
+          password: "${JENKINS_ADMIN_PASSWORD:-admin123!}"
+        - id: "ci-service"
+          name: "TIBCO BWCE GitOps Automated Bot"
+          password: "${JENKINS_SERVICE_PASSWORD:-service123!}"
+
+  authorizationStrategy:
+    projectMatrix:
+      permissions:
+        - "Overall/Administer:admin"
+        - "Overall/Read:authenticated"
+        - "Overall/Read:anonymous"
+        - "Job/Build:authenticated"
+        - "Job/Read:authenticated"
+        - "Job/Read:anonymous"
+        - "Job/Cancel:authenticated"
+        - "Job/Workspace:authenticated"
+        - "View/Read:authenticated"
+        - "View/Read:anonymous"
+        - "Metrics/View:anonymous"
+        - "Metrics/View:authenticated"
+
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "PLATFORM_DOMAIN"
+            value: "apps.ocp-dev.nubenetes.internal"
+          - key: "GITOPS_REPO"
+            value: "https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git"
+          - key: "DEV_REGISTRY_HOST"
+            value: "image-registry.openshift-image-registry.svc:5000"
+          - key: "STAGING_REGISTRY_HOST"
+            value: "image-registry.openshift-image-registry.svc:5000"
+          - key: "PROD_REGISTRY_HOST"
+            value: "image-registry.openshift-image-registry.svc:5000"
+          - key: "BWCE_BASE_IMAGE"
+            value: "tibco/bwce:2.9.2"
+
+unclassified:
+  location:
+    url: "https://jenkins-jenkins.apps.ocp-dev.nubenetes.internal/"
+    adminAddress: "devops-bwce@nubenetes.io"
+
+  # Datadog CI Visibility & APM Plugin Configuration
+  datadogGlobalConfiguration:
+    datadogApiKey: "${DATADOG_API_KEY:-}"
+    site: "datadoghq.com"
+    reportWith: "HTTP"
+    targetHost: "datadog-agent.datadog.svc.cluster.local"
+    targetPort: 8125
+    targetTraceAgentPort: 8126
+    emitSystemMetrics: true
+    collectBuildLogs: true
+
+  # Global Pipeline Libraries Configuration
+  globalLibraries:
+    libraries:
+      - name: "nubenetes-bwce-shared-library"
+        defaultVersion: "main"
+        implicit: true
+        allowVersionOverride: true
+        includeInChangesets: false
+        retriever:
+          modernSCM:
+            scm:
+              git:
+                remote: "https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git"
+                traits:
+                  - gitBranchDiscovery
+
+# Master Seed Job Definition using JCasC Job DSL Integration
+jobs:
+  - script: |
+      job('00-Seed-Job-Platform-Orchestrator') {
+        description('Master Seed Job provisioning TIBCO BWCE Multibranch CI Pipelines.')
+        keepDependencies(false)
+        scm {
+          git {
+            remote {
+              url('https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git')
+            }
+            branch('*/main')
+          }
+        }
+        steps {
+          jobDsl {
+            targets('jobdsl/seed-job.groovy\njobdsl/pipelines-ci.groovy')
+            removedJobAction('DELETE')
+            removedViewAction('DELETE')
+            lookupStrategy('JENKINS_ROOT')
+          }
+        }
+        triggers {
+          scm('H/15 * * * *')
+        }
+      }

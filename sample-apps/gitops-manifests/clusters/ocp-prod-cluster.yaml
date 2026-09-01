@@ -1,0 +1,27 @@
+# ==============================================================================
+# Cluster Specification: OCP PROD Cluster
+# ==============================================================================
+apiVersion: infrastructure.nubenetes.io/v1alpha1
+kind: OpenShiftCluster
+metadata:
+  name: ocp-prod
+spec:
+  apiEndpoint: "https://api.ocp-prod.nubenetes.internal:6443"
+  appsDomain: "apps.ocp-prod.nubenetes.internal"
+  region: "eu-west-1"
+  zone: "prod-az3"
+  environment: "prod"
+  sccRestrictedV2: true
+  registries:
+    internal: "image-registry.openshift-image-registry.svc:5000"
+    external: "default-route-openshift-image-registry.apps.ocp-prod.nubenetes.internal"
+    namespacePrefix: "nubenetes-prod-bwce"
+  argocd:
+    serverName: "ocp-prod-cluster"
+    syncPolicy: "ManualApprovalRequired"
+    prune: false
+    selfHeal: false
+  datadog:
+    clusterAgentEnabled: true
+    clusterName: "ocp-prod"
+    site: "datadoghq.eu"
