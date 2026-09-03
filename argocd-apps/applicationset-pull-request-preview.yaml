@@ -32,7 +32,7 @@ spec:
       source:
         repoURL: https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git
         targetRevision: "{{head_sha}}"
-        path: k8s/overlays/dev
+        path: sample-apps/tibco-bwce-order-service/k8s/overlays/dev
       destination:
         server: https://kubernetes.default.svc
         namespace: "pr-preview-{{number}}-bwce"

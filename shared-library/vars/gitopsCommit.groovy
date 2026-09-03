@@ -17,6 +17,18 @@ def call(Map config = [:]) {
             git config --global user.name "Nubenetes BWCE GitOps Bot"
             git config --global user.email "gitops-bwce@nubenetes.io"
 
+            # Ensure GitOps repository is cloned or initialized
+            if [ ! -d ".git" ]; then
+                echo "Cloning GitOps repository ${gitopsRepo}..."
+                git clone --depth 1 "${gitopsRepo}" . 2>/dev/null || {
+                    echo "Cloning remote repository failed or offline sandbox; checking parent workspace..."
+                    if [ -d "../sample-apps" ]; then
+                        cp -r ../sample-apps .
+                        git init -b "main"
+                    fi
+                }
+            fi
+
             # Update Kustomize overlay if present
             KUSTOMIZE_OVERLAY="sample-apps/${appName}/k8s/overlays/${envName}/kustomization.yaml"
             if [ -f "\$KUSTOMIZE_OVERLAY" ]; then

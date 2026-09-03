@@ -29,12 +29,20 @@ kubectl create configmap jenkins-pod-templates-config \
   --namespace=jenkins \
   --dry-run=client -o yaml | kubectl apply -f - || true
 
+kubectl create configmap jenkins-github-credentials \
+  --from-file=github-app-credentials.yaml="${SCRIPT_DIR}/jcasc/github-app-credentials.yaml" \
+  --namespace=jenkins \
+  --dry-run=client -o yaml | kubectl apply -f - || true
+
 kubectl create configmap jenkins-jobdsl-scripts \
   --from-file="${SCRIPT_DIR}/jobdsl" \
   --namespace=jenkins \
   --dry-run=client -o yaml | kubectl apply -f - || true
 
-kubectl apply -f "${SCRIPT_DIR}/config/clusters.yaml" || true
+kubectl create configmap nubenetes-cluster-topology \
+  --from-file=clusters.yaml="${SCRIPT_DIR}/config/clusters.yaml" \
+  --namespace=jenkins \
+  --dry-run=client -o yaml | kubectl apply -f - || true
 
 # Step 3: Deploy Datadog Observability Stack
 echo "===> [3/6] Deploying Datadog Agent & APM..."

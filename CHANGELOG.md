@@ -1,0 +1,51 @@
+# Changelog
+
+All notable changes to the **TIBCO BWCE Jenkins Without Git Parameter (Pure GitOps)** project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.0.0] - 2026-09-03
+
+### Summary
+Initial production-ready release of the **TIBCO BWCE Jenkins Without Git Parameter** enterprise reference platform on **Red Hat OpenShift 4.20+** and **Kubernetes 1.31+**. Reviewed, audited, and hardened using **Gemini 3.8 Flash**.
+
+This release establishes the **Pure GitOps** paradigm for TIBCO BusinessWorks Container Edition (BWCE): continuous integration compiles, tests, and builds BWCE EAR containers with zero UI parameter dropdowns, while **ArgoCD 3.5 ApplicationSets** declaratively deploy workloads across multi-cluster environments with Datadog APM tracing.
+
+---
+
+### 🚀 Added
+- **Multi-Cluster Declarative Registrations**:
+  - Registered DEV (`in-cluster`), STAGING (`ocp-staging-cluster`), and PROD (`ocp-prod-cluster`) cluster secrets in `scripts/setup-argocd-clusters.sh` with standardized `environment` labels.
+- **Dynamic Cluster Topology Mounting**:
+  - Provisioned `nubenetes-cluster-topology` ConfigMap from `config/clusters.yaml` in `deploy.sh`.
+- **JCasC GitHub Credentials Integration**:
+  - Packaged `jcasc/github-app-credentials.yaml` into ConfigMap `jenkins-github-credentials` in `deploy.sh`.
+- **PR Preview Token Provisioning**:
+  - Added automated creation of `github-token-secret` in namespace `argocd` via `scripts/generate-tokens.sh`.
+- **Resilient GitOps Repository Automation**:
+  - Added automatic cloning and fallback repository initialization to `shared-library/vars/gitopsCommit.groovy`.
+
+---
+
+### 🛠️ Fixed
+- **Purged `git-parameter` Remnants**:
+  - Removed `git-parameter:0.10.0` from `installPlugins` in `helm/jenkins/values.yaml` and pinned `github:1.40.0` and `github-branch-source:1802.v26c6d00e998a_`.
+- **Fixed ArgoCD Multi-Cluster ApplicationSet Generator**:
+  - Rewrote `argocd-apps/applicationset-clusters.yaml` to use standard cluster generators with label selectors, eliminating invalid self-referencing template strings and preventing Cartesian product deployments.
+- **Fixed Ephemeral PR Preview Path**:
+  - Corrected invalid path `k8s/overlays/dev` to `sample-apps/tibco-bwce-order-service/k8s/overlays/dev` in `argocd-apps/applicationset-pull-request-preview.yaml`.
+- **Enhanced Script Portability**:
+  - Fixed relative directory assumptions in `destroy.sh` and `scripts/gitops-promote.sh` using dynamic `SCRIPT_DIR` and `REPO_ROOT` resolution.
+- **Modernized Kustomize Overlays**:
+  - Replaced deprecated `bases:` with `resources:` in `sample-apps/tibco-bwce-order-service/k8s/overlays/*/kustomization.yaml`.
+
+---
+
+### 🧹 Removed
+- **Typo Directory**:
+  - Removed accidental typo folder `sample-apps/tibco-bwce-customer-api/{k8s`.
+- **Contradictory Documentation**:
+  - Cleaned `sample-apps/gitops-manifests/README.md` to remove legacy `git-parameter` badges and obsolete links.

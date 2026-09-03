@@ -1,27 +1,22 @@
 # ==============================================================================
-# ArgoCD ApplicationSet: Multi-Cluster Matrix Generator for TIBCO BWCE
+# ArgoCD ApplicationSet: Multi-Cluster Environment Generator for TIBCO BWCE
 # ==============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: matrix-bwce-multicluster-workloads
+  name: bwce-multicluster-workloads
   namespace: argocd
 spec:
   generators:
-    - matrix:
-        generators:
-          - clusters:
-              selector:
-                matchLabels:
-                  environment: "{{metadata.labels.environment}}"
-          - git:
-              repoURL: https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git
-              revision: main
-              directories:
-                - path: sample-apps/tibco-bwce-order-service/k8s/overlays/*
+    # Cluster Generator: Discovers registered OpenShift clusters by environment label
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: environment
+              operator: Exists
   template:
     metadata:
-      name: "{{path.basename}}-{{name}}"
+      name: "tibco-bwce-order-service-{{metadata.labels.environment}}"
       namespace: argocd
       labels:
         environment: "{{metadata.labels.environment}}"
@@ -31,8 +26,8 @@ spec:
       project: default
       source:
         repoURL: https://github.com/nubenetes/jenkins-without-git-parameter-bwce.git
-        targetRevision: "{{metadata.labels.environment}}"
-        path: "{{path}}"
+        targetRevision: main
+        path: "sample-apps/tibco-bwce-order-service/k8s/overlays/{{metadata.labels.environment}}"
       destination:
         server: "{{server}}"
         namespace: "nubenetes-{{metadata.labels.environment}}-bwce"

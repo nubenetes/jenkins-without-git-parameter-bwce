@@ -9,11 +9,14 @@ APP_NAME="${1:-tibco-bwce-order-service}"
 TARGET_ENV="${2:-staging}"
 IMAGE_TAG="${3:-latest}"
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
 echo "======================================================================"
 echo "🚀 TIBCO BWCE GITOPS RELEASE PROMOTION: ${APP_NAME} -> ${TARGET_ENV} (${IMAGE_TAG})"
 echo "======================================================================"
 
-KUSTOMIZE_FILE="sample-apps/${APP_NAME}/k8s/overlays/${TARGET_ENV}/kustomization.yaml"
+KUSTOMIZE_FILE="${REPO_ROOT}/sample-apps/${APP_NAME}/k8s/overlays/${TARGET_ENV}/kustomization.yaml"
 
 if [ -f "${KUSTOMIZE_FILE}" ]; then
     echo "Updating ${KUSTOMIZE_FILE} with newTag: ${IMAGE_TAG}..."
@@ -22,7 +25,7 @@ fi
 
 echo "✅ Manifests updated."
 echo "Creating Git commit for promotion..."
-git status --short sample-apps/
+git -C "${REPO_ROOT}" status --short sample-apps/
 echo "To commit and push to Git (triggering ArgoCD sync):"
 echo "  git commit -am 'feat(gitops): promote ${APP_NAME} to ${IMAGE_TAG} for ${TARGET_ENV}'"
 echo "  git push origin main"
