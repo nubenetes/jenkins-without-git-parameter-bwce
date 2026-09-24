@@ -117,6 +117,7 @@
 - [Repository Structure](#repository-structure)
 - [Quick Start: 1-Click Automated Deployment](#quick-start-1-click-automated-deployment)
 - [Decommissioning & Reinstallation](#decommissioning--reinstallation)
+- [Video Walkthroughs & Architecture References (YouTube)](#video-walkthroughs--architecture-references-youtube)
 - [References & Standards](#references--standards)
 
 ---
@@ -1283,6 +1284,63 @@ make destroy
 # or
 make reinstall
 ```
+
+---
+
+## Video Walkthroughs & Architecture References (YouTube)
+
+Architectural deep dives, video walkthroughs, and technical shorts for `jenkins-without-git-parameter-bwce`, TIBCO BWCE modernization, and Datadog GitOps progressive delivery on OpenShift 4.20+ are hosted on the **[Nubenetes YouTube Channel (@nubenetes)](https://www.youtube.com/@nubenetes)**.
+
+<details open>
+<summary>📂 <strong>Full-Length Technical Deep Dives & Explanations</strong></summary>
+
+<br/>
+
+##### 1. Modernize TIBCO BWCE on OpenShift 4: Cloud-Native GitOps, Datadog APM & Argo Rollouts
+- 🔗 **Link**: [https://www.youtube.com/watch?v=XZX2pD3XqQM](https://www.youtube.com/watch?v=XZX2pD3XqQM)
+- 🌐 **Language**: English (Original Audio)
+- ⏱️ **Duration**: 8:12
+- 🏷️ **Domain**: TIBCO BWCE Modernization, CFS Throttling Fix & Zero-Trust Secrets
+- 📝 **Full Description**:
+> 🚀 Architectural blueprint for modernizing legacy TIBCO BusinessWorks Container Edition (BWCE) microservices on Red Hat OpenShift 4.20+. Explains 12-factor configuration externalization via `.substvar`, eliminating pod CPU limits to prevent Linux CFS quota bandwidth throttling on 64-thread engines, OpenMetrics scraping on port 8090, and automated canary rollouts with Argo Rollouts and Datadog APM.
+
+##### 2. Datadog in GitOps: Full-Stack Observability, CI Visibility & Automated Canary Rollouts
+- 🔗 **Link**: [https://www.youtube.com/watch?v=VQKNKBGRxQM](https://www.youtube.com/watch?v=VQKNKBGRxQM)
+- 🌐 **Language**: English (Original Audio)
+- ⏱️ **Duration**: 7:55
+- 🏷️ **Domain**: Full-Stack Observability, Jenkins CI Visibility & Argo Rollouts SLA Tripwires
+- 📝 **Full Description**:
+> 🚀 Deep dive into using Datadog as the central nervous system for multi-cluster GitOps platforms on OpenShift 4.20+. Covers the DaemonSet architecture (port 8126 APM, port 8125 DogStatsD, JSON logs), Jenkins CI Visibility plugin for build trace correlation and agent queue bottlenecks, runtime Java APM tracing, and metric-driven progressive delivery with automated rollbacks when 5xx errors exceed 0.1% or P99 latency exceeds 250ms.
+
+</details>
+
+<details open>
+<summary>📂 <strong>Architecture Video Shorts & Guides</strong></summary>
+
+<br/>
+
+### 📑 Quick Index Matrix
+
+| # | Short Title | Domain / Pillar | Duration | Direct Link |
+|---|---|---|---|---|
+| 1 | [How CFS Throttling Freezes TIBCO BWCE](https://www.youtube.com/shorts/XyKAGxQScVo) | Linux CFS Quota Throttling | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/XyKAGxQScVo) |
+| 2 | [How Datadog Automates Canary Rollouts](https://www.youtube.com/shorts/RPtczCFl2vU) | Argo Rollouts & APM Tripwire | `1:26` | [▶️ Watch](https://www.youtube.com/shorts/RPtczCFl2vU) |
+
+<br/>
+
+##### 1. How CFS Throttling Freezes TIBCO BWCE
+- 🔗 **Link**: [https://www.youtube.com/shorts/XyKAGxQScVo](https://www.youtube.com/shorts/XyKAGxQScVo)
+- ⏱️ **Duration**: 1:13
+- 📝 **Full Description**:
+> 🚀 Explains the Linux CFS Quota throttling trap on multi-threaded (64 threads) TIBCO BWCE containers: why pod-level CPU limits cause kernel freezes and latency spikes despite idle node CPU, and why capacity must be managed at the namespace level.
+
+##### 2. How Datadog Automates Canary Rollouts
+- 🔗 **Link**: [https://www.youtube.com/shorts/RPtczCFl2vU](https://www.youtube.com/shorts/RPtczCFl2vU)
+- ⏱️ **Duration**: 1:26
+- 📝 **Full Description**:
+> 🚀 How Argo Rollouts and Datadog APM automate canary validation for critical microservices: routing 20% traffic, evaluating live SLA thresholds (error rate under 0.1%, latency under 250ms), and triggering instant rollbacks if latency degrades.
+
+</details>
 
 ---
 
