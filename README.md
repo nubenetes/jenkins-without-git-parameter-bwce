@@ -1312,6 +1312,14 @@ Architectural deep dives, video walkthroughs, and technical shorts for `jenkins-
 - 📝 **Full Description**:
 > 🚀 Deep dive into using Datadog as the central nervous system for multi-cluster GitOps platforms on OpenShift 4.20+. Covers the DaemonSet architecture (port 8126 APM, port 8125 DogStatsD, JSON logs), Jenkins CI Visibility plugin for build trace correlation and agent queue bottlenecks, runtime Java APM tracing, and metric-driven progressive delivery with automated rollbacks when 5xx errors exceed 0.1% or P99 latency exceeds 250ms.
 
+##### 3. Jenkins Pure GitOps: Decoupling CI from ArgoCD Multi-Cluster CD
+- 🔗 **Link**: [https://www.youtube.com/watch?v=qntcMvzBx4w](https://www.youtube.com/watch?v=qntcMvzBx4w)
+- 🌐 **Language**: English (Original Audio)
+- ⏱️ **Duration**: 7:52
+- 🏷️ **Domain**: CI/CD Decoupling, SCM Blind Spot & Pull-Based GitOps for TIBCO BWCE
+- 📝 **Full Description**:
+> 🚀 Architectural breakdown of the SCM pre-execution render paradox when orchestrating TIBCO BWCE multi-repo deployments with Jenkins git-parameter, and how shifting to pure GitOps with ArgoCD solves it.
+
 </details>
 
 <details open>
@@ -1325,6 +1333,8 @@ Architectural deep dives, video walkthroughs, and technical shorts for `jenkins-
 |---|---|---|---|---|
 | 1 | [How CFS Throttling Freezes TIBCO BWCE](https://www.youtube.com/shorts/XyKAGxQScVo) | Linux CFS Quota Throttling | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/XyKAGxQScVo) |
 | 2 | [How Datadog Automates Canary Rollouts](https://www.youtube.com/shorts/RPtczCFl2vU) | Argo Rollouts & APM Tripwire | `1:26` | [▶️ Watch](https://www.youtube.com/shorts/RPtczCFl2vU) |
+| 3 | [How Pure GitOps Reverses Deployments](https://www.youtube.com/shorts/0-NIxNk7cuM) | Pull Model vs Push Scripts | `1:12` | [▶️ Watch](https://www.youtube.com/shorts/0-NIxNk7cuM) |
+| 4 | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | Eliminating UI Deploy Buttons | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
 
 <br/>
 
@@ -1339,6 +1349,18 @@ Architectural deep dives, video walkthroughs, and technical shorts for `jenkins-
 - ⏱️ **Duration**: 1:26
 - 📝 **Full Description**:
 > 🚀 How Argo Rollouts and Datadog APM automate canary validation for critical microservices: routing 20% traffic, evaluating live SLA thresholds (error rate under 0.1%, latency under 250ms), and triggering instant rollbacks if latency degrades.
+
+##### 3. How Pure GitOps Reverses Deployments
+- 🔗 **Link**: [https://www.youtube.com/shorts/0-NIxNk7cuM](https://www.youtube.com/shorts/0-NIxNk7cuM)
+- ⏱️ **Duration**: 1:12
+- 📝 **Full Description**:
+> 🚀 How GitOps completely inverts traditional deployment architecture: replacing fragile external push scripts with an internal ArgoCD controller pulling state from Git without exposing cluster credentials.
+
+##### 4. The Shift to Pure GitOps Deployments
+- 🔗 **Link**: [https://www.youtube.com/shorts/iKTgIsbQCcQ](https://www.youtube.com/shorts/iKTgIsbQCcQ)
+- ⏱️ **Duration**: 1:23
+- 📝 **Full Description**:
+> 🚀 Why leading platform engineering teams eliminate manual UI deploy buttons, moving from fragile multi-repo parameter dropdowns to webhook-triggered CI and pull-based ArgoCD synchronization.
 
 </details>
 
