@@ -149,6 +149,7 @@ This repository is accompanied by an educational video masterclass and technical
 | **04** | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | **Eliminating UI Deploy Buttons**<br/>Replacing Jenkins UI dropdowns with Git pull requests & ArgoCD synchronization | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
 | **05** | [How Pure GitOps Replaces Jenkins Push](https://www.youtube.com/shorts/akk2ZJrK_Io) | **Zero-Trust CI/CD Security**<br/>Stripping cluster admin credentials from Jenkins & relying on in-cluster ArgoCD pull | `1:19` | [▶️ Watch](https://www.youtube.com/shorts/akk2ZJrK_Io) |
 | **06** | [Cómo funciona un despliegue Canary automatizado](https://www.youtube.com/shorts/DgkKpSksmjQ) 🇪🇸 | **Despliegue Progresivo y SLA en Tiempo Real**<br/>División de tráfico 20/80 con Argo Rollouts y rollbacks automáticos con Datadog APM | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/DgkKpSksmjQ) |
+| **07** | [How Canary Rollouts Catch Bad Code](https://www.youtube.com/shorts/chEnuYwsRgQ) | **Progressive Delivery & SLA Tripwires**<br/>Argo Rollouts 20/80 traffic split with Datadog real-time 5xx/latency rollbacks | `1:18` | [▶️ Watch](https://www.youtube.com/shorts/chEnuYwsRgQ) |
 
 *For complete technical summaries, topic breakdowns, and direct studio links, see [Section: Video Walkthroughs & Architecture References](#video-walkthroughs--architecture-references-youtube).*
 
@@ -1424,6 +1425,7 @@ Architectural masterclass analyzing the transformation from legacy Jenkins push 
 | **04** | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | **Eliminating UI Deploy Buttons**<br/>Replacing Jenkins UI dropdowns with Git pull requests & ArgoCD synchronization | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
 | **05** | [How Pure GitOps Replaces Jenkins Push](https://www.youtube.com/shorts/akk2ZJrK_Io) | **Zero-Trust CI/CD Security**<br/>Stripping cluster admin credentials from Jenkins & relying on in-cluster ArgoCD pull | `1:19` | [▶️ Watch](https://www.youtube.com/shorts/akk2ZJrK_Io) |
 | **06** | [Cómo funciona un despliegue Canary automatizado](https://www.youtube.com/shorts/DgkKpSksmjQ) 🇪🇸 | **Despliegue Progresivo y SLA en Tiempo Real**<br/>División de tráfico 20/80 con Argo Rollouts y rollbacks automáticos con Datadog APM | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/DgkKpSksmjQ) |
+| **07** | [How Canary Rollouts Catch Bad Code](https://www.youtube.com/shorts/chEnuYwsRgQ) | **Progressive Delivery & SLA Tripwires**<br/>Argo Rollouts 20/80 traffic split with Datadog real-time 5xx/latency rollbacks | `1:18` | [▶️ Watch](https://www.youtube.com/shorts/chEnuYwsRgQ) |
 
 <br/>
 
@@ -1480,6 +1482,15 @@ Details why legacy Jenkins push models expose critical cluster-admin credentials
 - 📝 **Technical Overview**:
 Explica cómo los despliegues progresivos Canary protegen microservicios críticos en OpenShift. Detalla la división de tráfico (20% canary / 80% estable) y la evaluación automatizada de SLAs con Datadog APM (tasa de error inferior al 0.1% y latencia P99 inferior a 250ms), ejecutando un rollback automático en milisegundos si se detectan anomalías.
 - 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/DgkKpSksmjQ) | [Edit in YouTube Studio](https://studio.youtube.com/video/DgkKpSksmjQ/edit)
+
+##### 7. How Canary Rollouts Catch Bad Code
+- 🔗 **Direct Link**: [https://www.youtube.com/shorts/chEnuYwsRgQ](https://www.youtube.com/shorts/chEnuYwsRgQ)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
+- ⏱️ **Duration**: 1:18
+- 🏷️ **Engineering Domain**: Progressive Delivery, Argo Rollouts & Datadog SLA Tripwire
+- 📝 **Technical Overview**:
+Demonstrates how automated canary rollouts protect production microservices from breaking releases. Details traffic splitting with Argo Rollouts (routing 20% live traffic to the canary and 80% to stable) and continuous Datadog APM SLA verification (5xx error rate under 0.1%, P99 latency below 250ms), executing instant automated rollbacks in milliseconds if anomalies are detected.
+- 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/chEnuYwsRgQ) | [Edit in YouTube Studio](https://studio.youtube.com/video/chEnuYwsRgQ/edit)
 
 </details>
 
