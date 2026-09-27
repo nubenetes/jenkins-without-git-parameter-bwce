@@ -82,7 +82,79 @@
 
 ---
 
+<a id="quick-navigation-map"></a>
+## 🗺️ Quick Navigation Map
+
+This enterprise repository implements a **Pure GitOps (Pull-based)** delivery model for TIBCO BWCE microservices on Red Hat OpenShift 4.20+. By decoupling Jenkins into a lean, parameterless CI build engine and orchestrating multi-cluster deployments via Git and ArgoCD 3.5 ApplicationSets, this architecture eliminates the SCM pre-execution render paradox and external credential exposure. Use this map to navigate the platform blueprint, declarative manifests, and multimedia resources:
+
+### 🧭 Repository Architecture Blueprint
+```text
+jenkins-without-git-parameter-bwce/       # 🚀 Pure GitOps Platform Orchestrator (Monorepo)
+├── 📁 argocd-apps/                      # ArgoCD Application & ApplicationSet Declarative Manifests
+│   ├── 📄 applicationset-clusters.yaml  # Multi-cluster deployment generator (DEV, STG, PROD)
+│   ├── 📄 applicationset-git-branches.yaml # Native Git branch parameterization generator
+│   ├── 📄 applicationset-pull-request-preview.yaml # Dynamic ephemeral PR preview environments
+│   ├── 📄 root-app-of-apps.yaml         # Declarative Root Application orchestrator
+│   └── 📁 apps/                         # App manifests for Jenkins, Datadog & BWCE services
+├── 📁 jcasc/                            # Jenkins Configuration as Code (JCasC 2.492.2 LTS)
+│   ├── 📄 jenkins-jcasc.yaml            # Master JCasC (security, credentials, agents, Datadog)
+│   ├── 📄 github-app-credentials.yaml   # GitHub App tokenless authentication
+│   └── 📄 pod-templates.yaml            # Ephemeral Kubernetes builder agent templates
+├── 📁 jobdsl/                           # Parameterless Programmatic Pipelines (Job DSL)
+│   ├── 📄 seed-job.groovy               # Seed job automatically bootstrapping CI pipelines
+│   └── 📄 pipelines-ci.groovy           # Parameterless CI build, test, containerize & sign
+├── 📁 sample-apps/                      # Embedded Workload Microservices & GitOps Manifests
+│   ├── 📁 tibco-bwce-order-service/     # TIBCO BWCE microservice with 12-Factor .substvar profiles
+│   ├── 📁 tibco-bwce-customer-api/      # TIBCO BWCE customer integration microservice
+│   └── 📁 gitops-manifests/             # Helm charts, Argo Rollouts canary, & overlays
+├── 📁 observability/                    # Datadog Full-Stack Observability Suite
+│   ├── 📁 dashboards/                   # Datadog JSON dashboards for BWCE JVM & CI Visibility
+│   └── 📁 monitors/                     # Datadog APM alerts & Argo Rollouts SLA tripwires
+├── 📁 security/                         # Zero-Trust & Supply Chain Security Hardening
+│   ├── 📁 external-secrets-operator/    # ESO ClusterSecretStores syncing HashiCorp Vault secrets
+│   ├── 📄 openshift-image-signature-policy.yaml # Cosign SLSA 3 signature verification
+│   └── 📄 openshift-namespace-resource-quota.yaml # CPU quota governance replacing pod limits
+├── 📁 helm/                             # Helm charts for ArgoCD, Jenkins, and BWCE apps
+└── 📁 scripts/                          # Automated provisioning and promotion scripts
+    ├── 📄 gitops-promote.sh             # Pull-request based semantic promotion helper
+    ├── 📄 deploy-datadog-agent.sh       # Datadog Agent OCP deployment with OpenMetrics
+    └── 📄 ocp-setup-scc.sh              # OpenShift restricted-v2 SCC configuration
+```
+
+<a id="ai-multimedia-series"></a>
+## 🎬 AI-Generated Multimedia Series (YouTube)
+
+This repository is accompanied by an educational video masterclass and technical shorts synthesized with **Gemini NotebookLM** based directly on the architectural patterns, multi-cluster Pure GitOps pipelines, and enterprise security controls from this project. All videos are freely accessible on YouTube on the [**@nubenetes**](https://youtube.com/@nubenetes) channel.
+
+> [!NOTE]
+> **Multilingual Learning Experience**:  
+> Content features native spoken audio in **English 🇺🇸**, with automated YouTube closed captions (CC) translated into **Spanish 🇪🇸 and 20+ languages** for global engineering teams.
+
+### 📽️ Full-Length Technical Deep Dives (Architecture Masterclasses)
+
+| # | Video Guide Title | Engineering Domain & Core Architecture | Duration | Direct Link |
+|:---:|:---|:---|:---:|:---:|
+| **01** | [Modernize TIBCO BWCE on OpenShift](https://www.youtube.com/watch?v=XZX2pD3XqQM) | **Cloud-Native Modernization & CFS Quota Fix**<br/>12-Factor .substvar profile externalization, removing CPU limits & Datadog APM | `8:12` | [▶️ Watch](https://www.youtube.com/watch?v=XZX2pD3XqQM) |
+| **02** | [Datadog in GitOps](https://www.youtube.com/watch?v=VQKNKBGRxQM) | **Full-Stack Observability & Automated Canary Rollouts**<br/>Datadog APM, Jenkins CI Visibility, and Argo Rollouts SLA tripwire | `7:56` | [▶️ Watch](https://www.youtube.com/watch?v=VQKNKBGRxQM) |
+| **03** | [Jenkins Pure GitOps](https://www.youtube.com/watch?v=qntcMvzBx4w) | **CI/CD Decoupling & Pure GitOps**<br/>Solving the SCM blind spot, eliminating UI deploy buttons & ArgoCD pull model | `7:52` | [▶️ Watch](https://www.youtube.com/watch?v=qntcMvzBx4w) |
+
+### ⚡ Video Shorts Matrix
+
+| # | Short Title | Architectural Domain & Focus | Duration | Action |
+|:---:|:---|:---|:---:|:---:|
+| **01** | [How CFS Throttling Freezes TIBCO BWCE](https://www.youtube.com/shorts/XyKAGxQScVo) | **Linux CFS Kernel Quota Throttling**<br/>Eliminating pod CPU limits on 64-thread JVMs & managing quota via ResourceQuotas | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/XyKAGxQScVo) |
+| **02** | [How Datadog Automates Microservice Canary Rollouts](https://www.youtube.com/shorts/RPtczCFl2vU) | **Progressive Delivery & SLA Tripwires**<br/>Argo Rollouts 20/80 traffic split with Datadog real-time 5xx/latency rollbacks | `1:27` | [▶️ Watch](https://www.youtube.com/shorts/RPtczCFl2vU) |
+| **03** | [How Pure GitOps Reverses Deployments](https://www.youtube.com/shorts/0-NIxNk7cuM) | **Pure GitOps Architecture**<br/>In-cluster ArgoCD pulling state vs fragile external push scripts | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/0-NIxNk7cuM) |
+| **04** | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | **Eliminating UI Deploy Buttons**<br/>Replacing Jenkins UI dropdowns with Git pull requests & ArgoCD synchronization | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
+
+*For complete technical summaries, topic breakdowns, and direct studio links, see [Section: Video Walkthroughs & Architecture References](#video-walkthroughs--architecture-references-youtube).*
+
+---
+
 ## 📑 Table of Contents
+
+- [Quick Navigation Map](#quick-navigation-map)
+- [AI-Generated Multimedia Series (YouTube)](#ai-multimedia-series)
 
 - [Executive Summary & Architectural Paradigm Shift](#executive-summary--architectural-paradigm-shift)
 - [In-Depth Architectural Comparison: Push vs. Pull Model for TIBCO BWCE](#in-depth-architectural-comparison-push-vs-pull-model-for-tibco-bwce)
@@ -1292,75 +1364,90 @@ make reinstall
 Architectural deep dives, video walkthroughs, and technical shorts for `jenkins-without-git-parameter-bwce`, TIBCO BWCE modernization, and Datadog GitOps progressive delivery on OpenShift 4.20+ are hosted on the **[Nubenetes YouTube Channel (@nubenetes)](https://www.youtube.com/@nubenetes)**.
 
 <details open>
-<summary>📂 <strong>Full-Length Technical Deep Dives & Explanations</strong></summary>
+<summary>📂 <strong>Full-Length Technical Deep Dives (Architecture Masterclasses)</strong></summary>
 
 <br/>
 
-##### 1. Modernize TIBCO BWCE on OpenShift 4: Cloud-Native GitOps, Datadog APM & Argo Rollouts
-- 🔗 **Link**: [https://www.youtube.com/watch?v=XZX2pD3XqQM](https://www.youtube.com/watch?v=XZX2pD3XqQM)
-- 🌐 **Language**: English (Original Audio)
+##### 1. Modernize TIBCO BWCE on OpenShift: GitOps, Datadog & Argo Rollouts
+- 🔗 **Direct Link**: [https://www.youtube.com/watch?v=XZX2pD3XqQM](https://www.youtube.com/watch?v=XZX2pD3XqQM)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
 - ⏱️ **Duration**: 8:12
-- 🏷️ **Domain**: TIBCO BWCE Modernization, CFS Throttling Fix & Zero-Trust Secrets
-- 📝 **Full Description**:
-> 🚀 Architectural blueprint for modernizing legacy TIBCO BusinessWorks Container Edition (BWCE) microservices on Red Hat OpenShift 4.20+. Explains 12-factor configuration externalization via `.substvar`, eliminating pod CPU limits to prevent Linux CFS quota bandwidth throttling on 64-thread engines, OpenMetrics scraping on port 8090, and automated canary rollouts with Argo Rollouts and Datadog APM.
+- 🏷️ **Engineering Domain**: Cloud-Native Modernization, CFS Quota Fix & Zero-Trust Secrets
+- 📝 **Technical Overview**:
+Architectural blueprint for modernizing legacy TIBCO BusinessWorks Container Edition (BWCE) microservices on Red Hat OpenShift 4.20+. Explains 12-factor configuration externalization via `.substvar`, eliminating pod CPU limits to prevent Linux CFS quota bandwidth throttling on 64-thread engines, OpenMetrics scraping on port 8090, and automated canary rollouts with Argo Rollouts and Datadog APM.
+- 🛠️ **Direct Links**: [Watch on YouTube](https://www.youtube.com/watch?v=XZX2pD3XqQM) | [Edit in YouTube Studio](https://studio.youtube.com/video/XZX2pD3XqQM/edit)
 
-##### 2. Datadog in GitOps: Full-Stack Observability, CI Visibility & Automated Canary Rollouts
-- 🔗 **Link**: [https://www.youtube.com/watch?v=VQKNKBGRxQM](https://www.youtube.com/watch?v=VQKNKBGRxQM)
-- 🌐 **Language**: English (Original Audio)
-- ⏱️ **Duration**: 7:55
-- 🏷️ **Domain**: Full-Stack Observability, Jenkins CI Visibility & Argo Rollouts SLA Tripwires
-- 📝 **Full Description**:
-> 🚀 Deep dive into using Datadog as the central nervous system for multi-cluster GitOps platforms on OpenShift 4.20+. Covers the DaemonSet architecture (port 8126 APM, port 8125 DogStatsD, JSON logs), Jenkins CI Visibility plugin for build trace correlation and agent queue bottlenecks, runtime Java APM tracing, and metric-driven progressive delivery with automated rollbacks when 5xx errors exceed 0.1% or P99 latency exceeds 250ms.
+##### 2. Datadog in GitOps: Full-Stack Observability & Automated Canary Rollouts
+- 🔗 **Direct Link**: [https://www.youtube.com/watch?v=VQKNKBGRxQM](https://www.youtube.com/watch?v=VQKNKBGRxQM)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
+- ⏱️ **Duration**: 7:56
+- 🏷️ **Engineering Domain**: Full-Stack Observability, Jenkins CI Visibility & Argo Rollouts SLA Tripwires
+- 📝 **Technical Overview**:
+Deep dive into using Datadog as the central nervous system for multi-cluster GitOps platforms on OpenShift 4.20+. Covers the DaemonSet architecture (port 8126 APM, port 8125 DogStatsD, JSON logs), Jenkins CI Visibility plugin for build trace correlation and agent queue bottlenecks, runtime Java APM tracing, and metric-driven progressive delivery with automated rollbacks when 5xx errors exceed 0.1% or P99 latency exceeds 250ms.
+- 🛠️ **Direct Links**: [Watch on YouTube](https://www.youtube.com/watch?v=VQKNKBGRxQM) | [Edit in YouTube Studio](https://studio.youtube.com/video/VQKNKBGRxQM/edit)
 
 ##### 3. Jenkins Pure GitOps: Decoupling CI from ArgoCD Multi-Cluster CD
-- 🔗 **Link**: [https://www.youtube.com/watch?v=qntcMvzBx4w](https://www.youtube.com/watch?v=qntcMvzBx4w)
-- 🌐 **Language**: English (Original Audio)
+- 🔗 **Direct Link**: [https://www.youtube.com/watch?v=qntcMvzBx4w](https://www.youtube.com/watch?v=qntcMvzBx4w)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
 - ⏱️ **Duration**: 7:52
-- 🏷️ **Domain**: CI/CD Decoupling, SCM Blind Spot & Pull-Based GitOps for TIBCO BWCE
-- 📝 **Full Description**:
-> 🚀 Architectural breakdown of the SCM pre-execution render paradox when orchestrating TIBCO BWCE multi-repo deployments with Jenkins git-parameter, and how shifting to pure GitOps with ArgoCD solves it.
+- 🏷️ **Engineering Domain**: CI/CD Decoupling, SCM Blind Spot & Pull-Based GitOps for TIBCO BWCE
+- 📝 **Technical Overview**:
+Architectural breakdown of the SCM pre-execution render paradox when orchestrating TIBCO BWCE multi-repo deployments with Jenkins git-parameter, and how shifting to pure GitOps with ArgoCD solves it. Details the transition to parameterless Jenkins pipelines and declarative GitOps synchronization with ArgoCD 3.5 ApplicationSets.
+- 🛠️ **Direct Links**: [Watch on YouTube](https://www.youtube.com/watch?v=qntcMvzBx4w) | [Edit in YouTube Studio](https://studio.youtube.com/video/qntcMvzBx4w/edit)
 
 </details>
 
 <details open>
-<summary>📂 <strong>Architecture Video Shorts & Guides</strong></summary>
+<summary>📂 <strong>Technical Shorts Matrix & Architecture Breakdowns</strong></summary>
 
 <br/>
 
-### 📑 Quick Index Matrix
+### ⚡ Video Shorts Matrix
 
-| # | Short Title | Domain / Pillar | Duration | Direct Link |
-|---|---|---|---|---|
-| 1 | [How CFS Throttling Freezes TIBCO BWCE](https://www.youtube.com/shorts/XyKAGxQScVo) | Linux CFS Quota Throttling | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/XyKAGxQScVo) |
-| 2 | [How Datadog Automates Canary Rollouts](https://www.youtube.com/shorts/RPtczCFl2vU) | Argo Rollouts & APM Tripwire | `1:26` | [▶️ Watch](https://www.youtube.com/shorts/RPtczCFl2vU) |
-| 3 | [How Pure GitOps Reverses Deployments](https://www.youtube.com/shorts/0-NIxNk7cuM) | Pull Model vs Push Scripts | `1:12` | [▶️ Watch](https://www.youtube.com/shorts/0-NIxNk7cuM) |
-| 4 | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | Eliminating UI Deploy Buttons | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
+| # | Short Title | Architectural Domain & Focus | Duration | Action |
+|:---:|:---|:---|:---:|:---:|
+| **01** | [How CFS Throttling Freezes TIBCO BWCE](https://www.youtube.com/shorts/XyKAGxQScVo) | **Linux CFS Kernel Quota Throttling**<br/>Eliminating pod CPU limits on 64-thread JVMs & managing quota via ResourceQuotas | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/XyKAGxQScVo) |
+| **02** | [How Datadog Automates Microservice Canary Rollouts](https://www.youtube.com/shorts/RPtczCFl2vU) | **Progressive Delivery & SLA Tripwires**<br/>Argo Rollouts 20/80 traffic split with Datadog real-time 5xx/latency rollbacks | `1:27` | [▶️ Watch](https://www.youtube.com/shorts/RPtczCFl2vU) |
+| **03** | [How Pure GitOps Reverses Deployments](https://www.youtube.com/shorts/0-NIxNk7cuM) | **Pure GitOps Architecture**<br/>In-cluster ArgoCD pulling state vs fragile external push scripts | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/0-NIxNk7cuM) |
+| **04** | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | **Eliminating UI Deploy Buttons**<br/>Replacing Jenkins UI dropdowns with Git pull requests & ArgoCD synchronization | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
 
 <br/>
 
 ##### 1. How CFS Throttling Freezes TIBCO BWCE
-- 🔗 **Link**: [https://www.youtube.com/shorts/XyKAGxQScVo](https://www.youtube.com/shorts/XyKAGxQScVo)
+- 🔗 **Direct Link**: [https://www.youtube.com/shorts/XyKAGxQScVo](https://www.youtube.com/shorts/XyKAGxQScVo)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
 - ⏱️ **Duration**: 1:13
-- 📝 **Full Description**:
-> 🚀 Explains the Linux CFS Quota throttling trap on multi-threaded (64 threads) TIBCO BWCE containers: why pod-level CPU limits cause kernel freezes and latency spikes despite idle node CPU, and why capacity must be managed at the namespace level.
+- 🏷️ **Engineering Domain**: Linux Kernel cgroups, CFS Quota Throttling & 64-Thread JVM Sizing
+- 📝 **Technical Overview**:
+Explains the Linux CFS Quota throttling trap on multi-threaded (64 threads) TIBCO BWCE containers: why pod-level CPU limits cause kernel freezes and latency spikes despite idle node CPU, and why capacity must be managed at the namespace level via OpenShift ResourceQuotas.
+- 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/XyKAGxQScVo) | [Edit in YouTube Studio](https://studio.youtube.com/video/XyKAGxQScVo/edit)
 
-##### 2. How Datadog Automates Canary Rollouts
-- 🔗 **Link**: [https://www.youtube.com/shorts/RPtczCFl2vU](https://www.youtube.com/shorts/RPtczCFl2vU)
-- ⏱️ **Duration**: 1:26
-- 📝 **Full Description**:
-> 🚀 How Argo Rollouts and Datadog APM automate canary validation for critical microservices: routing 20% traffic, evaluating live SLA thresholds (error rate under 0.1%, latency under 250ms), and triggering instant rollbacks if latency degrades.
+##### 2. How Datadog Automates Microservice Canary Rollouts
+- 🔗 **Direct Link**: [https://www.youtube.com/shorts/RPtczCFl2vU](https://www.youtube.com/shorts/RPtczCFl2vU)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
+- ⏱️ **Duration**: 1:27
+- 🏷️ **Engineering Domain**: Progressive Delivery, Argo Rollouts & Datadog SLA Tripwire
+- 📝 **Technical Overview**:
+How Argo Rollouts and Datadog APM automate canary validation for critical microservices: routing 20% traffic, evaluating live SLA thresholds (error rate under 0.1%, latency under 250ms), and triggering instant rollbacks if latency degrades.
+- 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/RPtczCFl2vU) | [Edit in YouTube Studio](https://studio.youtube.com/video/RPtczCFl2vU/edit)
 
 ##### 3. How Pure GitOps Reverses Deployments
-- 🔗 **Link**: [https://www.youtube.com/shorts/0-NIxNk7cuM](https://www.youtube.com/shorts/0-NIxNk7cuM)
-- ⏱️ **Duration**: 1:12
-- 📝 **Full Description**:
-> 🚀 How GitOps completely inverts traditional deployment architecture: replacing fragile external push scripts with an internal ArgoCD controller pulling state from Git without exposing cluster credentials.
+- 🔗 **Direct Link**: [https://www.youtube.com/shorts/0-NIxNk7cuM](https://www.youtube.com/shorts/0-NIxNk7cuM)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
+- ⏱️ **Duration**: 1:13
+- 🏷️ **Engineering Domain**: Pure GitOps Architecture & Pull Model vs Push Scripts
+- 📝 **Technical Overview**:
+How GitOps completely inverts traditional deployment architecture: replacing fragile external push scripts with an internal ArgoCD controller pulling state from Git without exposing cluster credentials.
+- 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/0-NIxNk7cuM) | [Edit in YouTube Studio](https://studio.youtube.com/video/0-NIxNk7cuM/edit)
 
 ##### 4. The Shift to Pure GitOps Deployments
-- 🔗 **Link**: [https://www.youtube.com/shorts/iKTgIsbQCcQ](https://www.youtube.com/shorts/iKTgIsbQCcQ)
+- 🔗 **Direct Link**: [https://www.youtube.com/shorts/iKTgIsbQCcQ](https://www.youtube.com/shorts/iKTgIsbQCcQ)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
 - ⏱️ **Duration**: 1:23
-- 📝 **Full Description**:
-> 🚀 Why leading platform engineering teams eliminate manual UI deploy buttons, moving from fragile multi-repo parameter dropdowns to webhook-triggered CI and pull-based ArgoCD synchronization.
+- 🏷️ **Engineering Domain**: Eliminating UI Deploy Buttons & SCM Blind Spot Resolution
+- 📝 **Technical Overview**:
+Why leading platform engineering teams eliminate manual UI deploy buttons, moving from fragile multi-repo parameter dropdowns to webhook-triggered CI and pull-based ArgoCD synchronization.
+- 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/iKTgIsbQCcQ) | [Edit in YouTube Studio](https://studio.youtube.com/video/iKTgIsbQCcQ/edit)
 
 </details>
 
