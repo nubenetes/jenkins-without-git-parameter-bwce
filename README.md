@@ -137,6 +137,7 @@ This repository is accompanied by an educational video masterclass and technical
 | **01** | [Modernize TIBCO BWCE on OpenShift](https://www.youtube.com/watch?v=XZX2pD3XqQM) | **Cloud-Native Modernization & CFS Quota Fix**<br/>12-Factor .substvar profile externalization, removing CPU limits & Datadog APM | `8:12` | [▶️ Watch](https://www.youtube.com/watch?v=XZX2pD3XqQM) |
 | **02** | [Datadog in GitOps](https://www.youtube.com/watch?v=VQKNKBGRxQM) | **Full-Stack Observability & Automated Canary Rollouts**<br/>Datadog APM, Jenkins CI Visibility, and Argo Rollouts SLA tripwire | `7:56` | [▶️ Watch](https://www.youtube.com/watch?v=VQKNKBGRxQM) |
 | **03** | [Jenkins Pure GitOps](https://www.youtube.com/watch?v=qntcMvzBx4w) | **CI/CD Decoupling & Pure GitOps**<br/>Solving the SCM blind spot, eliminating UI deploy buttons & ArgoCD pull model | `7:52` | [▶️ Watch](https://www.youtube.com/watch?v=qntcMvzBx4w) |
+| **04** | [TIBCO BWCE Pure GitOps](https://www.youtube.com/watch?v=sxETOfv6k_U) | **The Pure GitOps Paradigm Shift**<br/>Evolving from legacy Jenkins push pipelines to declarative ArgoCD pull sync | `8:30` | [▶️ Watch](https://www.youtube.com/watch?v=sxETOfv6k_U) |
 
 ### ⚡ Video Shorts Matrix
 
@@ -146,6 +147,8 @@ This repository is accompanied by an educational video masterclass and technical
 | **02** | [How Datadog Automates Microservice Canary Rollouts](https://www.youtube.com/shorts/RPtczCFl2vU) | **Progressive Delivery & SLA Tripwires**<br/>Argo Rollouts 20/80 traffic split with Datadog real-time 5xx/latency rollbacks | `1:27` | [▶️ Watch](https://www.youtube.com/shorts/RPtczCFl2vU) |
 | **03** | [How Pure GitOps Reverses Deployments](https://www.youtube.com/shorts/0-NIxNk7cuM) | **Pure GitOps Architecture**<br/>In-cluster ArgoCD pulling state vs fragile external push scripts | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/0-NIxNk7cuM) |
 | **04** | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | **Eliminating UI Deploy Buttons**<br/>Replacing Jenkins UI dropdowns with Git pull requests & ArgoCD synchronization | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
+| **05** | [How Pure GitOps Replaces Jenkins Push](https://www.youtube.com/shorts/akk2ZJrK_Io) | **Zero-Trust CI/CD Security**<br/>Stripping cluster admin credentials from Jenkins & relying on in-cluster ArgoCD pull | `1:19` | [▶️ Watch](https://www.youtube.com/shorts/akk2ZJrK_Io) |
+| **06** | [Cómo funciona un despliegue Canary automatizado](https://www.youtube.com/shorts/DgkKpSksmjQ) 🇪🇸 | **Despliegue Progresivo y SLA en Tiempo Real**<br/>División de tráfico 20/80 con Argo Rollouts y rollbacks automáticos con Datadog APM | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/DgkKpSksmjQ) |
 
 *For complete technical summaries, topic breakdowns, and direct studio links, see [Section: Video Walkthroughs & Architecture References](#video-walkthroughs--architecture-references-youtube).*
 
@@ -1395,6 +1398,15 @@ Deep dive into using Datadog as the central nervous system for multi-cluster Git
 Architectural breakdown of the SCM pre-execution render paradox when orchestrating TIBCO BWCE multi-repo deployments with Jenkins git-parameter, and how shifting to pure GitOps with ArgoCD solves it. Details the transition to parameterless Jenkins pipelines and declarative GitOps synchronization with ArgoCD 3.5 ApplicationSets.
 - 🛠️ **Direct Links**: [Watch on YouTube](https://www.youtube.com/watch?v=qntcMvzBx4w) | [Edit in YouTube Studio](https://studio.youtube.com/video/qntcMvzBx4w/edit)
 
+##### 4. TIBCO BWCE Pure GitOps: The Paradigm Shift from Jenkins Push to OpenShift Pull
+- 🔗 **Direct Link**: [https://www.youtube.com/watch?v=sxETOfv6k_U](https://www.youtube.com/watch?v=sxETOfv6k_U)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
+- ⏱️ **Duration**: 8:30
+- 🏷️ **Engineering Domain**: Pure GitOps Paradigm Shift, CI/CD Decoupling & ArgoCD 3.5 Pull Synchronization
+- 📝 **Technical Overview**:
+Architectural masterclass analyzing the transformation from legacy Jenkins push pipelines to declarative Pure GitOps pull architectures on OpenShift 4.20+. Explains why managing deployments through Jenkins UI dropdowns creates SCM blind spots and exposes cluster credentials, and how restricting Jenkins to parameterless CI while delegating CD to ArgoCD ensures zero-trust security and SLA governance.
+- 🛠️ **Direct Links**: [Watch on YouTube](https://www.youtube.com/watch?v=sxETOfv6k_U) | [Edit in YouTube Studio](https://studio.youtube.com/video/sxETOfv6k_U/edit)
+
 </details>
 
 <details open>
@@ -1410,6 +1422,8 @@ Architectural breakdown of the SCM pre-execution render paradox when orchestrati
 | **02** | [How Datadog Automates Microservice Canary Rollouts](https://www.youtube.com/shorts/RPtczCFl2vU) | **Progressive Delivery & SLA Tripwires**<br/>Argo Rollouts 20/80 traffic split with Datadog real-time 5xx/latency rollbacks | `1:27` | [▶️ Watch](https://www.youtube.com/shorts/RPtczCFl2vU) |
 | **03** | [How Pure GitOps Reverses Deployments](https://www.youtube.com/shorts/0-NIxNk7cuM) | **Pure GitOps Architecture**<br/>In-cluster ArgoCD pulling state vs fragile external push scripts | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/0-NIxNk7cuM) |
 | **04** | [The Shift to Pure GitOps Deployments](https://www.youtube.com/shorts/iKTgIsbQCcQ) | **Eliminating UI Deploy Buttons**<br/>Replacing Jenkins UI dropdowns with Git pull requests & ArgoCD synchronization | `1:23` | [▶️ Watch](https://www.youtube.com/shorts/iKTgIsbQCcQ) |
+| **05** | [How Pure GitOps Replaces Jenkins Push](https://www.youtube.com/shorts/akk2ZJrK_Io) | **Zero-Trust CI/CD Security**<br/>Stripping cluster admin credentials from Jenkins & relying on in-cluster ArgoCD pull | `1:19` | [▶️ Watch](https://www.youtube.com/shorts/akk2ZJrK_Io) |
+| **06** | [Cómo funciona un despliegue Canary automatizado](https://www.youtube.com/shorts/DgkKpSksmjQ) 🇪🇸 | **Despliegue Progresivo y SLA en Tiempo Real**<br/>División de tráfico 20/80 con Argo Rollouts y rollbacks automáticos con Datadog APM | `1:13` | [▶️ Watch](https://www.youtube.com/shorts/DgkKpSksmjQ) |
 
 <br/>
 
@@ -1448,6 +1462,24 @@ How GitOps completely inverts traditional deployment architecture: replacing fra
 - 📝 **Technical Overview**:
 Why leading platform engineering teams eliminate manual UI deploy buttons, moving from fragile multi-repo parameter dropdowns to webhook-triggered CI and pull-based ArgoCD synchronization.
 - 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/iKTgIsbQCcQ) | [Edit in YouTube Studio](https://studio.youtube.com/video/iKTgIsbQCcQ/edit)
+
+##### 5. How Pure GitOps Replaces Jenkins Push
+- 🔗 **Direct Link**: [https://www.youtube.com/shorts/akk2ZJrK_Io](https://www.youtube.com/shorts/akk2ZJrK_Io)
+- 🌐 **Origin Language**: English (Subtitles in 20+ languages)
+- ⏱️ **Duration**: 1:19
+- 🏷️ **Engineering Domain**: Zero-Trust CI/CD Security, Credential Elimination & Pull Synchronization
+- 📝 **Technical Overview**:
+Details why legacy Jenkins push models expose critical cluster-admin credentials to CI agents and struggle with UI parameter loading latency. Explains how Pure GitOps strips Jenkins of deployment power, restricting it to container builds while in-cluster ArgoCD pulls state securely.
+- 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/akk2ZJrK_Io) | [Edit in YouTube Studio](https://studio.youtube.com/video/akk2ZJrK_Io/edit)
+
+##### 6. Cómo funciona un despliegue Canary automatizado
+- 🔗 **Direct Link**: [https://www.youtube.com/shorts/DgkKpSksmjQ](https://www.youtube.com/shorts/DgkKpSksmjQ)
+- 🌐 **Origin Language**: Spanish 🇪🇸 (Subtitles in 20+ languages)
+- ⏱️ **Duration**: 1:13
+- 🏷️ **Engineering Domain**: Despliegue Progresivo, Argo Rollouts y Análisis de Métricas en Tiempo Real con Datadog APM
+- 📝 **Technical Overview**:
+Explica cómo los despliegues progresivos Canary protegen microservicios críticos en OpenShift. Detalla la división de tráfico (20% canary / 80% estable) y la evaluación automatizada de SLAs con Datadog APM (tasa de error inferior al 0.1% y latencia P99 inferior a 250ms), ejecutando un rollback automático en milisegundos si se detectan anomalías.
+- 🛠️ **Direct Links**: [Watch Short](https://www.youtube.com/shorts/DgkKpSksmjQ) | [Edit in YouTube Studio](https://studio.youtube.com/video/DgkKpSksmjQ/edit)
 
 </details>
 
